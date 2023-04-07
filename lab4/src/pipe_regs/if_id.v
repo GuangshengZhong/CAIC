@@ -7,5 +7,4 @@ module ID_IF(
 )
     PipeDff IF_ID_pc(.clk(ck),.bubble(bubble_id),.stall(stall_id),.default_val(`ZERO_WORD),.data_in(pc_if),.data_out(pc_id));
     PipeDff IF_ID_pc_plus4(.clk(clk),.bubble(bubble_id),.stall(stall_id),.default_val(`ZERO_WORD),.data_in(pc_plus4_if),.data_out(pc_plus4_id));
-    
 endmodule
