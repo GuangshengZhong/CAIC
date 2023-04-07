@@ -1,5 +1,5 @@
 `include "src/defines.v"
-module mem_wb_reg(
+module MEM_WB(
     input [31:0] pc_plus4_mem,
     input [31:0] imm_mem, alu_result_mem, mem2reg_data,
     input reg_write_mem, // 3rd =reg_write_enable 

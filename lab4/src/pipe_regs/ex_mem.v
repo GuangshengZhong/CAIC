@@ -1,6 +1,6 @@
 `include "src/defines.v"
 `include "src/templates/pipe_dff.v"
-module ex_mem_reg(
+module EX_MEM(
     input clk,
     input [31:0] pc_plus4_ex,
     input [31:0] imm_ex, rs2_data_ex, alu_result_ex,
