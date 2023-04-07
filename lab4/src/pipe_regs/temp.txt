@@ -1,0 +1,8 @@
+PipeDff ex_mem_rs2_data(
+        .clk(clk),
+        .bubble(bubble_mem),
+        .stall(stall_mem),
+        .default_val(`ZERO_WORD),
+        .data_in(rs2_data_ex),
+        .data_out(rs2_data_mem)
+    );
