@@ -33,14 +33,14 @@ module ID_EX(
     PipeDff ID_EX_instr_funct3(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(`SB),.data_in(instr_funct3_id),.data_out(instr_funct3_ex));
     PipeDff ID_EX_reg_src(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(`FROM_ALU),.data_in(reg_src_id),.data_out(reg_src_ex));
 
+    PipeDff ID_EX_mem_write(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(mem_write_id),.data_out(mem_write_ex));
     PipeDff ID_EX_reg_write(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(reg_write_id),.data_out(reg_write_ex));
-    PipeDff ID_EX_mem_write_id(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(mem_write_id_id),.data_out(mem_write_id_ex));
+    PipeDff ID_EX_jalr(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(jalr_id),.data_out(jalr_ex));
     PipeDff ID_EX_alu_src1(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(alu_src1_id),.data_out(alu_src1_ex));
-    PipeDff ID_EX_branch_id(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(branch_id_id),.data_out(branch_id_ex));
+    PipeDff ID_EX_branch(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(branch_id),.data_out(branch_ex));
+    PipeDff ID_EX_mem_read(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(mem_read_id),.data_out(mem_read_ex));
     PipeDff ID_EX_alu_src2(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(alu_src2_id),.data_out(alu_src2_ex));
-    PipeDff ID_EX_mem_read_id(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(mem_read_id_id),.data_out(mem_read_id_ex));
-    PipeDff ID_EX_jal_id(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(jal_id_id),.data_out(jal_id_ex));
-    PipeDff ID_EX_jalr_id(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(jalr_id_id),.data_out(jalr_id_ex));
+    PipeDff ID_EX_jal(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(jal_id),.data_out(jal_ex));
 
 
 endmodule
