@@ -21,5 +21,4 @@ module EX_MEM(
     output [2:0] write_type,
     output [31:0] write_data, mem_addr
 )
-    
 endmodule
