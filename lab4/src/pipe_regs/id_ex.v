@@ -43,4 +43,5 @@ module ID_EX(
     PipeDff ID_EX_jalr_id(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(jalr_id_id),.data_out(jalr_id_ex));
 
 
+
 endmodule
