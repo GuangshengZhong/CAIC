@@ -22,4 +22,5 @@ module EX_MEM(
     output [31:0] write_data, mem_addr
 )
     
+    
 endmodule
