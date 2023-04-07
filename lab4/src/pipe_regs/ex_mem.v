@@ -21,36 +21,5 @@ module EX_MEM(
     output [2:0] write_type,
     output [31:0] write_data, mem_addr
 )
-    PipeDff ex_mem_rs2_data(
-        .clk(clk),
-        .bubble(bubble_mem),
-        .stall(stall_mem),
-        .default_val(`ZERO_WORD),
-        .data_in(rs2_data_ex),
-        .data_out(rs2_data_mem)
-    );
-    PipeDff ex_mem_imm(
-        .clk(clk),
-        .bubble(bubble_mem),
-        .stall(stall_mem),
-        .default_val(`ZERO_WORD),
-        .data_in(imm_ex),
-        .data_out(imm_mem)
-    );
-    PipeDff ex_mem_alu_result(
-        .clk(clk),
-        .bubble(bubble_mem),
-        .stall(stall_mem),
-        .default_val(`ZERO_WORD),
-        .data_in(alu_result_ex),
-        .data_out(alu_result_mem)
-    );
-    PipeDff ex_mem_pc_plus4(
-        .clk(clk),
-        .bubble(bubble_mem),
-        .stall(stall_mem),
-        .default_val(`ZERO_WORD),
-        .data_in(pc_plus4_ex),
-        .data_out(pc_plus4_mem)
-    );	
+    
 endmodule

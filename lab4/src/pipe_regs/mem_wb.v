@@ -11,8 +11,5 @@ module MEM_WB(
     output [31:0] imm_wb, alu_result_wb, mem_to_reg_data_wb,
     output [1:0] reg_src_wb
 )
-    reg [31:0] mem_wb_reg_data = 32'b0;
-    always@(*) begin
-        
-    end
+    
 endmodule
