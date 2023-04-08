@@ -1,5 +1,4 @@
 `include "src/defines.v"
-`include "src/templates/pipe_dff.v"
 module EX_MEM(
     input clk,
     input [31:0] pc_plus4_ex,
