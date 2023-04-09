@@ -11,4 +11,7 @@ module Hazard_Detect_Unit(
     output stall_mem, bubble_mem,
     output stall_wb, bubble_wb
 )
+    if(mem_read_ex&&((rd_ex == rs1_id )||(rd_ex == rs2_id)))begin
+      stall_if = true; stall_id =true; stall_ex = true; stall_mem = true; stall_wb = true;
+    end//P53
 endmodule
