@@ -13,5 +13,9 @@ module Hazard_Detect_Unit(
 )
     if(mem_read_ex&&((rd_ex == rs1_id )||(rd_ex == rs2_id)))begin
       stall_if = true; stall_id =true; stall_ex = true; stall_mem = true; stall_wb = true;
-    end//P53
+    end//P5
+    else begin
+      stall_if = false; stall_id = false; stall_ex = false; stall_mem = false; stall_wb = false;
+    end
+    if(rd_mem)
 endmodule
