@@ -12,7 +12,7 @@ module MEM_WB(
     output [31:0] imm_wb, alu_result_wb, mem2reg_data_wb,
     output [1:0] reg_src_wb
 )
-    PipeDff MEM_WB_reg_src(.clk(clk),.bubble(bubble_wb),.stall(stall_wb),.default_val(`FROM_ALU),.data_in(reg_src_mem),.data_out(reg_src_wb));
+    PipeDff #(2) MEM_WB_reg_src(.clk(clk),.bubble(bubble_wb),.stall(stall_wb),.default_val(`FROM_ALU),.data_in(reg_src_mem),.data_out(reg_src_wb));
 
     PipeDff MEM_WB_mem2reg_data(.clk(clk),.bubble(bubble_wb),.stall(stall_wb),.default_val(`ZERO_WORD),.data_in(mem2reg_data_mem),.data_out(mem2reg_data_wb));
     PipeDff MEM_WB_alu_result(.clk(clk),.bubble(bubble_wb),.stall(stall_wb),.default_val(`ZERO_WORD),.data_in(alu_result_mem),.data_out(alu_result_wb));

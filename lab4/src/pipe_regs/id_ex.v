@@ -25,22 +25,22 @@ module ID_EX(
     PipeDff ID_EX_rs1_data(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(`ZERO_WORD),.data_in(rs1_data_id),.data_out(rs1_data_ex));
     PipeDff ID_EX_rs2_data(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(`ZERO_WORD),.data_in(rs2_data_id),.data_out(rs2_data_ex));
 
-    PipeDff ID_EX_rd(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(`ZERO_REG),.data_in(rd_id),.data_out(rd_ex));
-    PipeDff ID_EX_rs1(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(`ZERO_REG),.data_in(rs1_id),.data_out(rs1_ex));
-    PipeDff ID_EX_rs2(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(`ZERO_REG),.data_in(rs2_id),.data_out(rs2_ex));
+    PipeDff #(5) ID_EX_rd(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(`ZERO_REG),.data_in(rd_id),.data_out(rd_ex));
+    PipeDff #(5) ID_EX_rs1(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(`ZERO_REG),.data_in(rs1_id),.data_out(rs1_ex));
+    PipeDff #(5) ID_EX_rs2(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(`ZERO_REG),.data_in(rs2_id),.data_out(rs2_ex));
 
-    PipeDff ID_EX_alu_type(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(`ADD),.data_in(alu_type_id),.data_out(alu_type_ex));
-    PipeDff ID_EX_instr_funct3(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(`SB),.data_in(instr_funct3_id),.data_out(instr_funct3_ex));
-    PipeDff ID_EX_reg_src(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(`FROM_ALU),.data_in(reg_src_id),.data_out(reg_src_ex));
+    PipeDff #(4) ID_EX_alu_type(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(`ADD),.data_in(alu_type_id),.data_out(alu_type_ex));
+    PipeDff #(3) ID_EX_instr_funct3(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(`SB),.data_in(instr_funct3_id),.data_out(instr_funct3_ex));
+    PipeDff #(2) ID_EX_reg_src(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(`FROM_ALU),.data_in(reg_src_id),.data_out(reg_src_ex));
 
-    PipeDff ID_EX_mem_write(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(mem_write_id),.data_out(mem_write_ex));
-    PipeDff ID_EX_reg_write(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(reg_write_id),.data_out(reg_write_ex));
-    PipeDff ID_EX_jalr(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(jalr_id),.data_out(jalr_ex));
-    PipeDff ID_EX_alu_src1(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(alu_src1_id),.data_out(alu_src1_ex));
-    PipeDff ID_EX_branch(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(branch_id),.data_out(branch_ex));
-    PipeDff ID_EX_mem_read(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(mem_read_id),.data_out(mem_read_ex));
-    PipeDff ID_EX_alu_src2(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(alu_src2_id),.data_out(alu_src2_ex));
-    PipeDff ID_EX_jal(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(jal_id),.data_out(jal_ex));
+    PipeDff #(2) ID_EX_mem_write(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(mem_write_id),.data_out(mem_write_ex));
+    PipeDff #(1) ID_EX_reg_write(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(reg_write_id),.data_out(reg_write_ex));
+    PipeDff #(1) ID_EX_jalr(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(jalr_id),.data_out(jalr_ex));
+    PipeDff #(1) ID_EX_alu_src1(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(alu_src1_id),.data_out(alu_src1_ex));
+    PipeDff #(1) ID_EX_branch(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(branch_id),.data_out(branch_ex));
+    PipeDff #(1) ID_EX_mem_read(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(mem_read_id),.data_out(mem_read_ex));
+    PipeDff #(1) ID_EX_alu_src2(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(alu_src2_id),.data_out(alu_src2_ex));
+    PipeDff #(1) ID_EX_jal(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(jal_id),.data_out(jal_ex));
 
 
 endmodule

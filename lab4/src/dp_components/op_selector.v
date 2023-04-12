@@ -1,4 +1,5 @@
 `include "src/defines.v"
+`include "src/dp_components/forward_mux.v"
 module OpSelector(
     input alu_src1, alu_src2,
     input [31:0] rs1_data, rs2_data,
