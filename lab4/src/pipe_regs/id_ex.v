@@ -6,6 +6,7 @@ module ID_EX(
     input branch_id, jal_id, jalr_id, 
     input mem_read_id, mem_write_id, reg_write_id, // 3rd =reg_write_enable 
     input [1:0] reg_src_id,
+    input alu_src1_id, alu_srd2_id; 
     input [2:0] instr_funct3_id, //To Complete
     input [3:0] alu_type_id,
     input [4:0] rd_id, rs1_id, rs2_id,

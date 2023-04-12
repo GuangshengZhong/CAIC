@@ -9,7 +9,7 @@ module ControlUnit (
     output reg [1:0] reg_src,
     output reg [2:0] branch_type,
     output reg [2:0] load_type,
-    output reg branch, jal, jalr,
+    output branch, jal, jalr,
     output reg mem_read, mem_write, reg_write_enable
 );
     reg [6:0] opcode;
