@@ -2,15 +2,15 @@
 
 module ControlUnit (
     input [31:0] instr,
-    output reg [4:0] rs1_read_addr, rs2_read_addr, reg_write_addr,
-    //output reg [31:0] inst,
+    output [4:0] rs1_read_addr, rs2_read_addr, reg_write_addr,
+    output [31:0] instr_funct3,
     //output reg [31:0] write_data,
-    output reg [2:0] store_type,
-    output reg [1:0] reg_src,
-    output reg [2:0] branch_type,
-    output reg [2:0] load_type,
+    output [2:0] store_type,
+    output [1:0] reg_src,
+    output [2:0] branch_type,
+    output [2:0] load_type,
     output branch, jal, jalr,
-    output reg mem_read, mem_write, reg_write_enable
+    output mem_read, mem_write, reg_write_enable
 );
     reg [6:0] opcode;
     reg [2:0] funct3;
@@ -22,6 +22,7 @@ module ControlUnit (
     store_type = instr[14:12];
     rs1_read_addr = instr[19:15];
     rs2_read_addr = instr[24:20];
+    instr_funct3 = funct3;
     case (opcode)
         `INST_TYPE_R:begin//ADD SUB SLL SLT SLTU XOR SRL SRA OR AND 
             reg_write_addr = instr[11:7];

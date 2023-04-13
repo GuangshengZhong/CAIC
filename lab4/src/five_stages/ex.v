@@ -10,6 +10,7 @@ module EX_MODULE(
     input [1:0] rs1_fwd_ex, rs2_fwd_ex,
     //input branch, jal, jalr,
     output [31:0] alu_result,
+    //output [4:0] rs1_ex, rs2_ex,
     //output [31:0] new_pc,
     //output reg [31:0] mem_addr,//???
     //output [4:0] rs1_ex, rs2_ex,

@@ -18,4 +18,7 @@ module MEM_WB(
     PipeDff MEM_WB_alu_result(.clk(clk),.bubble(bubble_wb),.stall(stall_wb),.default_val(`ZERO_WORD),.data_in(alu_result_mem),.data_out(alu_result_wb));
     PipeDff MEM_WB_imm(.clk(clk),.bubble(bubble_wb),.stall(stall_wb),.default_val(`ZERO_WORD),.data_in(imm_mem),.data_out(imm_wb));
 
+    PipeDff #(5) MEM_WB_rd(.clk(clk),.bubble(bubble_wb),.stall(stall_wb),.default_val(`ZERO_REG),.data_in(rd_mem),.data_out(rd_wb));
+    PipeDff #(1) MEM_WB_rd(.clk(clk),.bubble(bubble_wb),.stall(stall_wb),.default_val(1'b0),.data_in(reg_write_mem),.data_out(reg_write_wb));
+
 endmodule

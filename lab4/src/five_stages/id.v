@@ -5,22 +5,29 @@
 `include "src/dp_components/pc_ex.v"
 module ID_MODULE(
     input [31:0] instr,
-    input [31:0] reg_write_data,
-    input [31:0] pc_id, pc_plus4_id,//for pc_ex
+    //input [31:0] reg_write_data,//用_wb _mem代替？
+    input [31:0] pc, pc_plus4,//for pc_ex
     input clk,
     input reg_write_data_mem,//new
+    input reg_write_data_wb,//new
+    input rs1_fwd_id,rs2_fwd_id;
+    output pc_src,
     output [1:0] reg_src, 
     output alu_src1, alu_src2,
     output mem_read, mem_write, 
     output [31:0] rs1_data, rs2_data, imm,
+    output [2:0] branch_type, load_type, store_type, instr_funct3,
     output [3:0] alu_type, 
-    output [2:0] branch_type, load_type, store_type,
+    output [4:0] rd, rs1, rs2,
     output branch, jal, jalr
 );
     wire [4:0] R_Addr1, R_Addr2, W_Addr;
     wire [31:0] R_Data1_p, R_Data2_p;
     wire reg_write_enable;
     wire branch_inn, jal_inn, jalr_inn;
+    assign rd = W_Addr;
+    assign rs1 = R_Addr1;
+    assign rs2 = R_Addr2;
     ImmGen ID_Imm_Gen(
         .instr(instr),
         .imm(imm)
@@ -35,7 +42,7 @@ module ID_MODULE(
         .jalr(jalr_inn),
         .mem_read(mem_read),
         .mem_write(mem_write),
-        //.inst(instr_out),
+        .instr_funct3(instr_funct3),
         //.write_data(reg_write_data),
         .reg_write_enable(reg_write_enable),
         .store_type(store_type),
