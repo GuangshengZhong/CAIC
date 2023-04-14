@@ -21,6 +21,17 @@ module RISCVPipeline (
     output [31:0] instr_addr, mem_addr, mem_write_data
 );
     wire stall_if, bubble_if, stall_id, bubble_id, stall_ex, bubble_ex, stall_mem, bubble_mem, stall_wb, bubble_wb;
+    //IF
+    wire pc_src;
+    wire [31:0] instr_if, pc_if, pc_plus4_if, new_pc;
+
+    IF_MODULE if_module(
+        .rst(rst), .clk(clk),
+        .pc_src(pc_src), .new_pc(new_pc),
+        .stall_if(stall_if), .bubble_if(bubble_if),
+        .instr(instr), .pc(pc)//??
+    );
+
     //ID
     wire [31:0] instr, instr_id, pc_id, pc_plus4_id, new_pc_id, imm_id, rs1_data_id, rs2_data_id ;
     wire branch_id, jal_id, jalr_id, mem_read_id, mem_write_id, reg_write_id, alu_src1_id, alu_src2_id;
@@ -29,6 +40,16 @@ module RISCVPipeline (
     wire [2:0] instr_funct3_id;
     wire [3:0] alu_type_id;
     wire [4:0] rd_id, rs1_id, rs2_id;
+
+    IF_ID if_id(
+        .clk(clk),
+        .instr_if(instr_if),
+        .pc_if(pc_if), .pc_plus4_if(pc_plus4_if),
+        .instr_id(instr_id), 
+        .pc_id(pc_id), .pc_plus4_id(pc_plus4_id),
+        .stall_id(stall_id), .bubble_id(bubble_id)
+    );
+
     ID_MODULE id_module(
         //From if
         .instr(instr),
@@ -182,5 +203,36 @@ module RISCVPipeline (
         .reg_write_data(reg_write_data_wb)
     );
 
+    //Hazard_detect_unit
+    Hazard_Detect_Unit hazard_detect_unit(
+        .rst(rst),
+        .pc_src_id(pc_src_id),
+        .jal_id(jal_id), .jalr_id(jalr_id), .branch_id(branch_id),
+        .rs1_id(rs1_id), .rs2_id(rs2_id), 
+        .rd_mem(rd_mem), .rd_ex(rd_ex),
+        .mem_read_ex(mem_read_ex), .mem_read_mem(mem_read_mem),
+        .stall_if(stall_if), .bubble_if(bubble_if),
+        .stall_id(stall_id), .bubble_id(bubble_id),
+        .stall_ex(stall_ex), .bubble_ex(bubble_ex),
+        .stall_mem(stall_mem), .bubble_mem(bubble_mem),
+        .stall_wb(stall_wb), .bubble_wb(bubble_wb)
+    );
 
+    //Forward_unit_id
+    Forward_Unit_Id forward_unit_id(
+        .jal_id(jal_id), .jalr_id(jalr_id), .branch_id(branch_id),
+        .rs1_id(rs1_id), .rs2_id(rs2_id), 
+        .reg_write_mem(reg_write_mem),
+        .rd_mem(rd_mem),
+        .rs1_fwd_id(rs1_fwd_id), .rs2_fwd_id(rs2_fwd_id)
+    );
+
+    //Forward_unit_ex
+    Forward_Unit_Ex forward_unit_ex(
+        .reg_write_mem(reg_write_mem),
+        .rd_mem(rd_mem),
+        .rs1_fwd_ex(rs1_fwd_ex), .rs2_fwd_ex(rs2_fwd_ex),
+        .rs1_ex(rs1_ex), .rs2_ex(rs2_ex),
+        .reg_write_wb(reg_write_wb), .rd_wb(rd_wb)
+    );
 endmodule

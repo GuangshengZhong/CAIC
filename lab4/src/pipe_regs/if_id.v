@@ -1,5 +1,5 @@
 `include "src/defines.v"
-module ID_IF(
+module IF_ID(
     input clk,
     input [31:0] instr_if, pc_if, pc_plus4_if,
     input stall_id, bubble_id,
