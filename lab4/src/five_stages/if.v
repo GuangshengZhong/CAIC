@@ -19,6 +19,7 @@ module IF_MODULE(
         .pc_src(pc_src),
         .new_pc(new_pc),
         .pc_plus4(pc_plus4),
+        .stall_if(stall_if),
         .pc(pc)
         );
     // INSTMEM IF_INSTMEM(

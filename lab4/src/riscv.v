@@ -33,9 +33,9 @@ module RISCVPipeline (
     );
 
     //ID
-    wire [31:0] instr, instr_id, pc_id, pc_plus4_id, new_pc_id, imm_id, rs1_data_id, rs2_data_id ;
+    wire [31:0] instr, instr_id, pc_id, pc_plus4_id, imm_id, rs1_data_id, rs2_data_id ;
     wire branch_id, jal_id, jalr_id, mem_read_id, mem_write_id, reg_write_id, alu_src1_id, alu_src2_id;
-    wire rs1_fwd_id,rs2_fwd_id;
+    wire [1:0] rs1_fwd_id,rs2_fwd_id;
     wire [1:0] reg_src_id;
     wire [2:0] instr_funct3_id;
     wire [3:0] alu_type_id;
@@ -69,7 +69,7 @@ module RISCVPipeline (
         //From fwd_unit_id
         .rs1_fwd_id(rs1_fwd_id),.rs2_fwd_id(rs2_fwd_id),
         //To hazard & To if
-        .pc_src(pc_src_id),.new_pc(new_pc_id)//??
+        .pc_src(pc_src),.new_pc(new_pc)//??
     );    
 
     //EX
@@ -206,7 +206,7 @@ module RISCVPipeline (
     //Hazard_detect_unit
     Hazard_Detect_Unit hazard_detect_unit(
         .rst(rst),
-        .pc_src_id(pc_src_id),
+        .pc_src_id(pc_src),
         .jal_id(jal_id), .jalr_id(jalr_id), .branch_id(branch_id),
         .rs1_id(rs1_id), .rs2_id(rs2_id), 
         .rd_mem(rd_mem), .rd_ex(rd_ex),
