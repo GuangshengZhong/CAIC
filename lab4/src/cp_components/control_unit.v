@@ -2,24 +2,24 @@
 
 module ControlUnit (
     input [31:0] instr,
-    output [4:0] rs1_read_addr, rs2_read_addr, reg_write_addr,
-    output [31:0] instr_funct3,
+    output reg [4:0] rs1_read_addr, rs2_read_addr, reg_write_addr,
+    output reg [2:0] instr_funct3,
     //output reg [31:0] write_data,
     output [2:0] store_type,
-    output [1:0] reg_src,
+    output reg [1:0] reg_src,
     output [2:0] branch_type,
     output [2:0] load_type,
-    output branch, jal, jalr,
-    output mem_read, mem_write, reg_write_enable
+    output reg branch, jal, jalr,
+    output reg mem_read, mem_write, reg_write_enable
 );
     reg [6:0] opcode;
     reg [2:0] funct3;
+    assign branch_type = funct3;
+    assign load_type = funct3;
+    assign store_type = funct3;
     always@(*) begin
     opcode = instr[6:0];
     funct3 = instr[14:12];
-    branch_type = instr[14:12];
-    load_type = instr[14:12];
-    store_type = instr[14:12];
     rs1_read_addr = instr[19:15];
     rs2_read_addr = instr[24:20];
     instr_funct3 = funct3;

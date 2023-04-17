@@ -15,7 +15,7 @@ module ID_MODULE(
     output pc_src,
     output [1:0] reg_src, 
     output alu_src1, alu_src2,
-    output mem_read, mem_write, 
+    output mem_read, mem_write, reg_write,
     output [31:0] rs1_data, rs2_data, imm,
     output [31:0] new_pc,
     output [2:0] branch_type, load_type, store_type, instr_funct3,
@@ -70,7 +70,7 @@ module ID_MODULE(
         .read_addr1(R_Addr1),
         .read_addr2(R_Addr2),
         .reg_write_addr(W_Addr),
-        .reg_write_data(reg_write_data),
+        .reg_write_data(reg_write_data_wb),//not sure
         .clk(clk),
         .read_data1(rs1_data_old),
         .read_data2(rs2_data_old),
@@ -102,4 +102,5 @@ module ID_MODULE(
     assign jal = jal_inn;
     assign jalr = jalr_inn;
     assign instr_funct3 = funct3_inn;
+    assign reg_write = reg_write_enable;
 endmodule

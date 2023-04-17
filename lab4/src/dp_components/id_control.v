@@ -7,10 +7,15 @@ module ID_Control(
     output [31:0] rs1_data_update, rs2_data_update,
     output zero, less_than
 );
-    always@(*)begin
-        rs1_data_update = (rs1_fwd_id == `FROM_MEM) ? reg_write_data_mem : rs1_data ;
-        rs2_data_update = (rs2_fwd_id == `FROM_MEM) ? reg_write_data_mem : rs2_data ;
-        zero  = (rs1_data_update == rs2_data_update) ;
-        less_than = ((funct3 == `BLTU)||(funct3 == `BGEU)) ? (rs1_data_update < rs2_data_update) : ($signed(rs1_data_update)<$signed(rs1_data_update));
-    end
+    // always@(*)begin
+    //     rs1_data_update = (rs1_fwd_id == `FROM_MEM) ? reg_write_data_mem : rs1_data ;
+    //     rs2_data_update = (rs2_fwd_id == `FROM_MEM) ? reg_write_data_mem : rs2_data ;
+    //     zero  = (rs1_data_update == rs2_data_update) ;
+    //     less_than = ((funct3 == `BLTU)||(funct3 == `BGEU)) ? (rs1_data_update < rs2_data_update) : ($signed(rs1_data_update)<$signed(rs1_data_update));
+    // end
+
+    assign rs1_data_update = (rs1_fwd_id == `FROM_MEM) ? reg_write_data_mem : rs1_data ;
+    assign rs2_data_update = (rs2_fwd_id == `FROM_MEM) ? reg_write_data_mem : rs2_data ;
+    assign zero  = (rs1_data_update == rs2_data_update) ;
+    assign less_than = ((funct3 == `BLTU)||(funct3 == `BGEU)) ? (rs1_data_update < rs2_data_update) : ($signed(rs1_data_update)<$signed(rs1_data_update));
 endmodule
