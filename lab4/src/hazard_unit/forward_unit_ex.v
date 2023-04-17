@@ -4,7 +4,7 @@ module Forward_Unit_Ex(
     input [4:0] rs1_ex,rs2_ex,rd_mem,
     input reg_write_wb,rd_wb,
     output [1:0]rs1_fwd_ex,rs2_fwd_ex
-)
+);
     always @(*) begin
         //EX_MEM hazard && MEM_WB hazard
         if((reg_write_mem)&&(rd_mem!=5'b0)&&(rd_mem == rs1_ex)) rs1_fwd_ex = `FWD_MEM;//From Slides P47

@@ -11,13 +11,13 @@ module ID_MODULE(
     input clk,
     input [31:0] reg_write_data_mem,//new
     input [31:0] reg_write_data_wb,//new
-    input [1:0] rs1_fwd_id,rs2_fwd_id;
+    input [1:0] rs1_fwd_id,rs2_fwd_id,
     output pc_src,
     output [1:0] reg_src, 
     output alu_src1, alu_src2,
     output mem_read, mem_write, 
     output [31:0] rs1_data, rs2_data, imm,
-    output [31:0] new_pc;
+    output [31:0] new_pc,
     output [2:0] branch_type, load_type, store_type, instr_funct3,
     output [3:0] alu_type, 
     output [4:0] rd, rs1, rs2,

@@ -10,13 +10,13 @@ module Hazard_Detect_Unit(
     output stall_ex, bubble_ex,
     output stall_mem, bubble_mem,
     output stall_wb, bubble_wb
-)
+);
 	wire stall;
 	wire bubble; 
 
     assign stall = ((mem_read_ex&&((rd_ex == rs1_id )||(rd_ex == rs2_id)))//load_use stall
 	||(branch_id&&((rd_mem == rs1_id )||(rd_mem == rs2_id)||(rd_ex == rs1_id )||(rd_ex == rs2_id)))//branch stall
-	||(jalr_id&&((rd_mem == rs1_id )||(rd_ex == rs1_id))&&(rs1_id!=0)))//jalr stall
+	||(jalr_id&&((rd_mem == rs1_id )||(rd_ex == rs1_id))&&(rs1_id!=0)));//jalr stall
 	assign bubble = (!stall) && pc_src_id;
 	
 	assign stall_if = stall;

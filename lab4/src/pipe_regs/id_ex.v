@@ -1,12 +1,12 @@
 `include "src/defines.v"
 module ID_EX(
-    input clk;
+    input clk,
     input [31:0] pc_id, pc_plus4_id, 
     input [31:0] imm_id, rs1_data_id, rs2_data_id,
     input branch_id, jal_id, jalr_id, 
     input mem_read_id, mem_write_id, reg_write_id, // 3rd =reg_write_enable 
     input [1:0] reg_src_id,
-    input alu_src1_id, alu_srd2_id; 
+    input alu_src1_id, alu_srd2_id,
     input [2:0] instr_funct3_id, //To Complete
     input [3:0] alu_type_id,
     input [4:0] rd_id, rs1_id, rs2_id,
@@ -19,7 +19,7 @@ module ID_EX(
     output [2:0] instr_funct3_ex,
     output [3:0] alu_type_ex, 
     output [4:0] rd_ex, rs1_ex, rs2_ex//[4:0]??
-)
+);
     PipeDff ID_EX_pc(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(`ZERO_WORD),.data_in(pc_id),.data_out(pc_ex));
     PipeDff ID_EX_pc_plus4(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(`ZERO_WORD),.data_in(pc_plus4_id),.data_out(pc_plus4_ex));
     PipeDff ID_EX_imm(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(`ZERO_WORD),.data_in(imm_id),.data_out(imm_ex));
