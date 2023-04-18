@@ -9,7 +9,7 @@ module IF_MODULE(
     input [31:0] new_pc,
     input stall_if, bubble_if,//new
     output [31:0] pc_plus4,
-    output [31:0] instr,
+    //output [31:0] instr,
     output [31:0] pc
 );
     wire [31:0] pc_incre = 32'h00000004;

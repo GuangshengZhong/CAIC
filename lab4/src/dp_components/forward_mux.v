@@ -4,7 +4,7 @@ module FWD_MUX(
     input [31:0] Data_MEM,
     input [31:0] Data_WB,
     input [1:0] fwd_ex,
-    output [31:0] Data_out
+    output reg [31:0] Data_out
 );
     always@(*) begin
         case(fwd_ex)

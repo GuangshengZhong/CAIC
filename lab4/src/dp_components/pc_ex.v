@@ -8,7 +8,7 @@ module PC_EX(
     input [31:0] imm,
     input zero, less_than,
     //input [31:0] alu_result,
-    output pc_src,//0:+4;1:new
+    output reg pc_src,//0:+4;1:new
     output reg [31:0] new_pc
 );
     always@(*)begin

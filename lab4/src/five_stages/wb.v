@@ -1,7 +1,7 @@
 `include "src/defines.v"
 module WB_MODULE(
     input [1:0] reg_src,
-    //input [31:0] pc_plus4,
+    input [31:0] pc_plus4,
     input [31:0] nxpc,//Change for lab4
     input [31:0] imm,
     input [31:0] alu_result,

@@ -1,9 +1,9 @@
 `include "src/defines.v"
 module Forward_Unit_Ex(
     input reg_write_mem,
-    input [4:0] rs1_ex,rs2_ex,rd_mem,
-    input reg_write_wb,rd_wb,
-    output [1:0]rs1_fwd_ex,rs2_fwd_ex
+    input [4:0] rs1_ex,rs2_ex,rd_mem,rd_wb,
+    input reg_write_wb,
+    output reg [1:0] rs1_fwd_ex,rs2_fwd_ex
 );
     always @(*) begin
         //EX_MEM hazard && MEM_WB hazard
