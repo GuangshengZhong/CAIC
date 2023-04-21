@@ -43,7 +43,7 @@ module RISCVPipeline (
     wire branch_id, jal_id, jalr_id, mem_read_id, mem_write_id, reg_write_id, alu_src1_id, alu_src2_id;
     wire [1:0] rs1_fwd_id,rs2_fwd_id;
     wire [1:0] reg_src_id;
-    wire [2:0] instr_funct3_id;
+    wire [2:0] branch_type_id, load_type_id, store_type_id, instr_funct3_id;//branch_type_id 暂时没用？
     wire [3:0] alu_type_id;
     wire [4:0] rd_id, rs1_id, rs2_id;
 
@@ -57,6 +57,7 @@ module RISCVPipeline (
     );
 
     ID_MODULE id_module(
+        .clk(clk),
         //From if
         .instr(instr),
         //From mem & wb
@@ -72,6 +73,7 @@ module RISCVPipeline (
         .instr_funct3(instr_funct3_id),.alu_type(alu_type_id),
         .rd(rd_id),.rs1(rs1_id),.rs2(rs2_id),
         .rs1_data(rs1_data_id),.rs2_data(rs2_data_id),.imm(imm_id),
+        //.branch_type(branch_type_id),.load_type(load_type_id), .store_type(store_type_id);
         //From fwd_unit_id
         .rs1_fwd_id(rs1_fwd_id),.rs2_fwd_id(rs2_fwd_id),
         //To hazard & To if
@@ -139,6 +141,7 @@ module RISCVPipeline (
     //wire [2:0] write_type_inn;
     //wire [31:0] write_data_inn, mem_addr_inn;
 
+    assign mem_addr = alu_result_mem;
     EX_MEM ex_mem(
         //From id_ex
         .clk(clk),
@@ -159,7 +162,6 @@ module RISCVPipeline (
         //From hazard
         .stall_mem(stall_mem),.bubble_mem(bubble_mem),
         //To Memory
-        .mem_write(ram_write),
         .write_type(write_type),
         .write_data(mem_write_data),
         .mem_addr(mem_addr),
@@ -167,18 +169,20 @@ module RISCVPipeline (
         .reg_write_mem(reg_write_mem),.rd_mem(rd_mem),
         .imm_mem(imm_mem),.pc_plus4_mem(pc_plus4_mem)
     );
-
+    assign ram_write = mem_write_mem;
+    assign write_type = instr_funct3_mem;
+    assign load_type_mem = instr_funct3_mem;
     MEM_MODULE mem_module(
         //From ex_mem
         .mem_read(mem_read_mem),
         .load_type(load_type_mem),//???
         //还有一堆信号干嘛去了？？
+        .reg_write_data_mem(reg_write_data_mem),
         //To mem_wb
         .mem2reg_data(mem2reg_data),
         //From memory
         .mem_read_data(mem_read_data)
     );
-
     //WB
     wire reg_write_wb;
     wire [1:0] reg_src_wb;

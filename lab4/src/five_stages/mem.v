@@ -3,7 +3,8 @@ module MEM_MODULE(
     input mem_read,
     input [2:0] load_type,
     input [31:0] mem_read_data,
-    output reg [31:0] mem2reg_data
+    output reg [31:0] mem2reg_data,
+    output reg [31:0] reg_write_data_mem
 );
     reg [31:0] temp;
     always@(*)begin
@@ -35,5 +36,6 @@ module MEM_MODULE(
             default: mem2reg_data = 32'b0;
         endcase
         end
+        reg_write_data_mem = mem2reg_data;
     end
 endmodule
