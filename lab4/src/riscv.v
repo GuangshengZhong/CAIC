@@ -116,12 +116,13 @@ module RISCVPipeline (
         .rd_ex(rd_ex),
         .pc_plus4_ex(pc_plus4_ex)
     );
-
+    wire [31:0] rs2_data_ex_new;
     EX_MODULE ex_module(
         .alu_type(alu_type_ex),
         .alu_src1(alu_src1_ex),.alu_src2(alu_src2_ex),
         .pc(pc_ex),
         .rs1_data(rs1_data_ex),.rs2_data(rs2_data_ex),
+        .rs2_data_ex_new(rs2_data_ex_new),
         .imm(imm_ex),
         //.rs1_ex(rs1_ex),rs2_ex(rs2_ex),
         .reg_write_data_mem(reg_write_data_mem),
@@ -153,7 +154,9 @@ module RISCVPipeline (
         .rd_ex(rd_ex),
         .pc_plus4_ex(pc_plus4_ex),
         //From ex
-        .rs2_data_ex(rs2_data_ex),.alu_result_ex(alu_result_ex),
+        .rs2_data_ex(rs2_data_ex_new),
+        //.rs2_data_ex(rs2_data_ex),
+        .alu_result_ex(alu_result_ex),
         //To mem_module
         .mem_read_mem(mem_read_mem),.mem_write_mem(mem_write_mem),
         .instr_funct3_mem(instr_funct3_mem),

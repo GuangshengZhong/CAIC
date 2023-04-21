@@ -10,6 +10,7 @@ module EX_MODULE(
     input [1:0] rs1_fwd_ex, rs2_fwd_ex,
     //input branch, jal, jalr,
     output [31:0] alu_result,
+    output [31:0] rs2_data_ex_new,
     //output [4:0] rs1_ex, rs2_ex,
     //output [31:0] new_pc,
     //output reg [31:0] mem_addr,//???
@@ -17,6 +18,7 @@ module EX_MODULE(
     output pc_src
 );
     wire [31:0] op1, op2;
+    wire [31:0] rs1_data_new, rs2_data_new;
     wire [31:0] alu_result_wire;
     wire zero,less_than;
     OpSelector EX_OP_SELECTOR(
@@ -31,7 +33,9 @@ module EX_MODULE(
         .pc(pc),
         .imm(imm),
         .op1(op1),
-        .op2(op2)
+        .op2(op2),
+        .rs1_data_new(rs1_data_new),
+        .rs2_data_new(rs2_data_new)
         );
     ALU EX_ALU(
         .alu_in1(op1),
@@ -42,4 +46,5 @@ module EX_MODULE(
         .less_than(less_than)
     );
     assign alu_result_wire = alu_result;
+    assign rs2_data_ex_new = rs2_data_new;
 endmodule
