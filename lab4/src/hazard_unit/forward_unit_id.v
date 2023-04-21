@@ -9,7 +9,7 @@ module Forward_Unit_Id(
         if(branch_id&&(rd_mem!=5'b0)&&(rd_mem == rs1_id)) rs1_fwd_id = `FWD_MEM;
         else if(jalr_id&&(rd_mem!=5'b0)&&(rd_mem == rs1_id)) rs1_fwd_id = `FWD_MEM;
         else rs1_fwd_id = `NO_FWD;
-        if(branch_id&&(rd_mem!=5'b0)&&(rd_mem == rs1_id)) rs2_fwd_id = `FWD_MEM;
+        if(branch_id&&(rd_mem!=5'b0)&&(rd_mem == rs2_id)) rs2_fwd_id = `FWD_MEM;
         else rs2_fwd_id = `NO_FWD;
         //jal?
     end

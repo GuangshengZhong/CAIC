@@ -25,7 +25,9 @@ module RegFile (
     end
 
     //read register
-    assign read_data1 = (read_addr1!=0) ? register_file[read_addr1] : 0;
-    assign read_data2 = (read_addr2!=0) ? register_file[read_addr2] : 0;
+    assign read_data1 = (read_addr1!=5'b0) ? register_file[read_addr1] : 0;
+    //assign read_data1 = register_file[read_addr1];
+    assign read_data2 = (read_addr2!=5'b0) ? register_file[read_addr2] : 0;
+    //assign read_data2 = register_file[read_addr2];
 
 endmodule

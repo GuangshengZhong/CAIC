@@ -142,6 +142,7 @@ module RISCVPipeline (
     //wire [31:0] write_data_inn, mem_addr_inn;
 
     assign mem_addr = alu_result_mem;
+    // assign mem_addr = alu_result_ex;//Totally Wrong
     EX_MEM ex_mem(
         //From id_ex
         .clk(clk),
