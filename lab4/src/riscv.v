@@ -33,7 +33,7 @@ module RISCVPipeline (
         //.instr(instr_if), 
         .pc(pc_if)//??
     );
-    assign instr_if = instr;
+    assign instr_if = bubble_if ? `INST_NOP : instr;
     assign instr_addr = pc_if;
     assign mem_write_data = rs2_data_mem;
     // assign mem_addr = ?
@@ -59,7 +59,7 @@ module RISCVPipeline (
     ID_MODULE id_module(
         .clk(clk),
         //From if
-        .instr(instr),
+        .instr(instr_id),
         //From mem & wb
         .reg_write_data_mem(reg_write_data_mem),
         .reg_write_data_wb(reg_write_data_wb),
@@ -222,7 +222,7 @@ module RISCVPipeline (
         .jal_id(jal_id), .jalr_id(jalr_id), .branch_id(branch_id),
         .rs1_id(rs1_id), .rs2_id(rs2_id), 
         .rd_mem(rd_mem), .rd_ex(rd_ex),
-        .mem_read_ex(mem_read_ex), .mem_read_mem(mem_read_mem),
+        .mem_read_ex(mem_read_ex), .mem_read_mem(mem_read_mem),.reg_write_ex(reg_write_ex),
         .stall_if(stall_if), .bubble_if(bubble_if),
         .stall_id(stall_id), .bubble_id(bubble_id),
         .stall_ex(stall_ex), .bubble_ex(bubble_ex),
