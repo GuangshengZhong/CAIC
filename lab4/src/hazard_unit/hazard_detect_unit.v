@@ -27,10 +27,10 @@ module Hazard_Detect_Unit(
 	assign stall_mem = 1'b0;
 	assign stall_wb = 1'b0;
 	
-	assign bubble_if = rst;
-	assign bubble_id = (rst||bubble);
-	assign bubble_ex = (rst||stall);
-	assign bubble_mem = rst;
-	assign bubble_wb = rst;
+	assign bubble_if = 1'b0;
+	assign bubble_id = bubble;
+	assign bubble_ex = stall;
+	assign bubble_mem = 1'b0;//？？
+	assign bubble_wb = 1'b0;//？？
 
 endmodule

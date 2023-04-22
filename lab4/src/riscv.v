@@ -69,10 +69,13 @@ module RISCVPipeline (
         .branch(branch_id),.jal(jal_id),.jalr(jalr_id),
         .mem_read(mem_read_id),.mem_write(mem_write_id),
         .alu_src1(alu_src1_id),.alu_src2(alu_src2_id),
-        .reg_write(reg_write_id),.reg_src(reg_src_id),
+        .reg_write_in(reg_write_wb),
+        .reg_write_out(reg_write_id),
+        .reg_src(reg_src_id),
         .instr_funct3(instr_funct3_id),.alu_type(alu_type_id),
         .rd(rd_id),.rs1(rs1_id),.rs2(rs2_id),
         .rs1_data(rs1_data_id),.rs2_data(rs2_data_id),.imm(imm_id),
+        .rd_wb(rd_wb),
         //.branch_type(branch_type_id),.load_type(load_type_id), .store_type(store_type_id);
         //From fwd_unit_id
         .rs1_fwd_id(rs1_fwd_id),.rs2_fwd_id(rs2_fwd_id),

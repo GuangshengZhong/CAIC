@@ -21,6 +21,7 @@ module IF_MODULE(
         .new_pc(new_pc),
         .pc_plus4(pc_plus4_inn),
         .stall_if(stall_if),
+        .bubble_if(bubble_if),
         .pc(pc)
         );
     // INSTMEM IF_INSTMEM(

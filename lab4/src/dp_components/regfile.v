@@ -16,7 +16,7 @@ module RegFile (
     end
 
     // write register
-    always @(posedge clk) 
+    always @(negedge clk) 
     begin
         if(reg_write_enable)
         begin
@@ -25,9 +25,7 @@ module RegFile (
     end
 
     //read register
-    assign read_data1 = (read_addr1!=5'b0) ? register_file[read_addr1] : 0;
-    //assign read_data1 = register_file[read_addr1];
-    assign read_data2 = (read_addr2!=5'b0) ? register_file[read_addr2] : 0;
-    //assign read_data2 = register_file[read_addr2];
+    assign read_data1 = (read_addr1!=0) ? register_file[read_addr1] : 0;
+    assign read_data2 = (read_addr2!=0) ? register_file[read_addr2] : 0;
 
 endmodule

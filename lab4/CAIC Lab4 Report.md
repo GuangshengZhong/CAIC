@@ -18,6 +18,14 @@ IF模块需要产生一些bubble
 
 Data_in出错->rs2_data_new出错->rs2_data出错（橙色是idmodule的）
 
+是忘了在regfile的端口里对reg_write_data_mem与reg_write_data_wb进行选择，仅仅接入了reg_write_data_wb
+
+在control unit里的`reg_write_addr = instr[11:7];`一句进行提前，实时更新
+
+写寄存器改为在negedge
+
+尤其需要注意的是id的reg_write，有一个out是往后传，有一个in是后面送过来的。一开始弄混了，debug了好久啊啊啊！
+
 ### test 1
 
 由于add的指令比起一堆lw lb什么的好读一些，所以就先从test1开始。

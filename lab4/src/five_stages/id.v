@@ -9,13 +9,15 @@ module ID_MODULE(
     //input [31:0] reg_write_data,//用_wb _mem代替？
     input [31:0] pc, pc_plus4,//for pc_ex
     input clk,
+    input reg_write_in,
     input [31:0] reg_write_data_mem,//new
     input [31:0] reg_write_data_wb,//new
     input [1:0] rs1_fwd_id,rs2_fwd_id,
+    input [4:0] rd_wb,//从wb传过来的
     output pc_src,
     output [1:0] reg_src, 
     output alu_src1, alu_src2,
-    output mem_read, mem_write, reg_write,
+    output mem_read, mem_write, reg_write_out,
     output [31:0] rs1_data, rs2_data, imm,
     output [31:0] new_pc,
     output [2:0] branch_type, load_type, store_type, instr_funct3,
@@ -28,7 +30,6 @@ module ID_MODULE(
     //wire [31:0] R_Data1_p, R_Data2_p;
     wire [31:0] rs1_data_old, rs2_data_old;
     wire [31:0] rs1_data_new, rs2_data_new;
-    wire reg_write_enable;
     wire branch_inn, jal_inn, jalr_inn;
     wire zero, less_than;
     assign rd = W_Addr;
@@ -38,6 +39,10 @@ module ID_MODULE(
         .instr(instr),
         .imm(imm)
     );
+
+    wire reg_write_enable;
+    assign reg_write_enable = reg_write_in || rs1_fwd_id || rs2_fwd_id;//???
+
     ControlUnit ID_Control_Unit(
         .instr(instr), 
         .rs1_read_addr(R_Addr1),
@@ -50,12 +55,13 @@ module ID_MODULE(
         .mem_write(mem_write),
         .instr_funct3(funct3_inn),
         //.write_data(reg_write_data),
-        .reg_write_enable(reg_write_enable),
+        .reg_write_enable(reg_write_out),
         .store_type(store_type),
         .reg_src(reg_src),
         .branch_type(branch_type),
         .load_type(load_type)
     );
+
     ALUControl ID_ALU_Control(
         .instr(instr),
         .alu_src1(alu_src1),
@@ -66,16 +72,23 @@ module ID_MODULE(
         //.pc(pc),
         .alu_type(alu_type)
     );
+
+    wire [31:0] reg_write_data_chosen;
+    wire [4:0] reg_write_addr;
+    assign reg_write_data_chosen = (rs1_fwd_id||rs2_fwd_id) ? reg_write_data_mem : reg_write_data_wb;
+    assign reg_write_addr = rs1_fwd_id ? R_Addr1 : (rs2_fwd_id ? R_Addr2 : rd_wb);
+
     RegFile ID_RegFile(
         .read_addr1(R_Addr1),
         .read_addr2(R_Addr2),
-        .reg_write_addr(W_Addr),
-        .reg_write_data(reg_write_data_wb),//not sure
+        .reg_write_addr(reg_write_addr),
+        .reg_write_data(reg_write_data_chosen),//not sure
         .clk(clk),
         .read_data1(rs1_data_old),
         .read_data2(rs2_data_old),
         .reg_write_enable(reg_write_enable)
     );
+
     ID_Control ID_ID_Control(
         .rs1_data(rs1_data_old), .rs2_data(rs2_data_old),
         .reg_write_data_mem(reg_write_data_mem),
@@ -84,6 +97,7 @@ module ID_MODULE(
         .rs1_data_update(rs1_data_new), .rs2_data_update(rs2_data_new),
         .zero(zero), .less_than(less_than)
     );
+
     PC_EX ID_PC_EX(
         .branch(branch_inn),.jal(jal_inn),.jalr(jalr_inn),
         .branch_type(branch_type),
@@ -96,11 +110,11 @@ module ID_MODULE(
         .pc_src(pc_src),
         .new_pc(new_pc)
     );
+
     assign rs1_data = rs1_data_new;
     assign rs2_data = rs2_data_new;
     assign branch = branch_inn;
     assign jal = jal_inn;
     assign jalr = jalr_inn;
     assign instr_funct3 = funct3_inn;
-    assign reg_write = reg_write_enable;
 endmodule
