@@ -14,6 +14,10 @@ IF模块需要产生一些bubble
 
 ## 2 痛苦Debug
 
+### test 0 
+
+Data_in出错->rs2_data_new出错->rs2_data出错（橙色是idmodule的）
+
 ### test 1
 
 由于add的指令比起一堆lw lb什么的好读一些，所以就先从test1开始。

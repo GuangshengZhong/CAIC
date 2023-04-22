@@ -19,7 +19,7 @@ module Hazard_Detect_Unit(
 	// ||(jalr_id&&((rd_mem == rs1_id )||(rd_ex == rs1_id))&&(rs1_id!=0)));//jalr stall
 
 	assign stall = (branch_id || jalr_id) &&((reg_write_ex&&((rd_ex == rs1_id )||(rd_ex == rs2_id)))||(mem_read_mem&&((rd_mem == rs1_id)||(rd_mem == rs2_id))));
-	assign bubble = (!stall) && pc_src_id;
+	assign bubble = (branch_id || jalr_id || jal_id);
 	
 	assign stall_if = stall;
 	assign stall_id = stall;//对if与id进行stall
