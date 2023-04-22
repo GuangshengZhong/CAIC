@@ -42,7 +42,7 @@ module ControlUnit (
             branch = 1'b0; jal = 1'b0; jalr = 1'b0;
             mem_read = 1'b0; mem_write = 1'b1;
             reg_write_enable = 1'b0;
-            reg_src = `FROM_MEM;//??
+            reg_src = `FROM_ALU;//lab4改了之后似乎ok了
         end
         `INST_TYPE_L:begin//LB LH LW LBU LHU
             mem_read = 1'b1;
@@ -56,7 +56,7 @@ module ControlUnit (
             branch = 1'b1; jal = 1'b0; jalr = 1'b0;
             mem_read = 1'b0; mem_write = 1'b0;
             reg_write_enable = 1'b0;
-            reg_src = `FROM_ALU;//??
+            reg_src = `FROM_ALU;
         end
         `INST_LUI:begin//LUI
             reg_write_addr = instr[11:7];
@@ -90,7 +90,7 @@ module ControlUnit (
             branch = 1'b0; jal = 1'b0; jalr = 1'b0;
             mem_read = 1'b0; mem_write = 1'b0;
             reg_write_enable = 1'b0;
-            reg_src = `FROM_ALU;
+            reg_src = `FROM_PC;//For 32'b0
         end
     endcase
     end

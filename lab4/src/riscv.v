@@ -176,12 +176,15 @@ module RISCVPipeline (
     assign ram_write = mem_write_mem;
     assign write_type = instr_funct3_mem;
     assign load_type_mem = instr_funct3_mem;
+
+    assign reg_write_data_mem = (reg_src_mem == `FROM_ALU) ? alu_result_mem : ((reg_src_mem == `FROM_MEM)? mem2reg_data : ((reg_src_mem == `FROM_IMM)? imm_mem:pc_plus4_mem));
+
     MEM_MODULE mem_module(
         //From ex_mem
         .mem_read(mem_read_mem),
         .load_type(load_type_mem),//???
         //还有一堆信号干嘛去了？？
-        .reg_write_data_mem(reg_write_data_mem),
+        //.reg_write_data_mem(reg_write_data_mem),
         //To mem_wb
         .mem2reg_data(mem2reg_data),
         //From memory

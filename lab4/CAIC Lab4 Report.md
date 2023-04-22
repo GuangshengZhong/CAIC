@@ -22,4 +22,4 @@ IF模块需要产生一些bubble
 
 
 
-写到了id，发现rs1_data_id有问题
+现在是14ns的时候rs2_data的选择出错，在ex阶段

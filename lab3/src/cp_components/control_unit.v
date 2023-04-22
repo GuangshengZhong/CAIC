@@ -89,7 +89,7 @@ module ControlUnit (
             branch = 1'b0; jal = 1'b0; jalr = 1'b0;
             mem_read = 1'b0; mem_write = 1'b0;
             reg_write_enable = 1'b0;
-            reg_src = `FROM_ALU;
+            reg_src = `FROM_PC;
         end
     endcase
     end
