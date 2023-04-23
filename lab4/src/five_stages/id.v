@@ -90,11 +90,13 @@ module ID_MODULE(
     );
 
     ID_Control ID_ID_Control(
+        .branch(branch_inn),
         .rs1_data(rs1_data_old), .rs2_data(rs2_data_old),
         .reg_write_data_mem(reg_write_data_mem),
         .rs1_fwd_id(rs1_fwd_id), .rs2_fwd_id(rs2_fwd_id),
         .funct3(funct3_inn),
         .rs1_data_update(rs1_data_new), .rs2_data_update(rs2_data_new),
+        .alu_type(alu_type),
         .zero(zero), .less_than(less_than)
     );
 

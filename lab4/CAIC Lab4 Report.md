@@ -43,3 +43,9 @@ Data_in出错->rs2_data_new出错->rs2_data出错（橙色是idmodule的）
 无论是否跳转，只要指令是branch类型，均将reg_src置为1？
 
 257ns处 pc+4_if本该为60但是为04
+
+257ns出的reg_src_mem应该是11而不是00
+
+目前的问题:zero和less than的计算的问题
+
+zero和less than

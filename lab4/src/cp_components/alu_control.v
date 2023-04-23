@@ -68,18 +68,18 @@ module ALUControl (
             alu_type = `ADD;
         end
         `INST_TYPE_B: begin
-            alu_src1 = 1'b1;
-            alu_src2 = 1'b1;
+            alu_src1 = 1'b0;
+            alu_src2 = 1'b0;
             // alu_op1 = R_Data1;
             // alu_op2 = R_Data2;
-            // case(funct3)
-            // 3'b000: alu_type = `XOR;//BEQ
-            // 3'b001: alu_type = `SUB;//BNE
-            // 3'b100: alu_type = `SLT;//BLT
-            // 3'b101: alu_type = `SLT;//BGE
-            // 3'b110: alu_type = `SLTU;//BLTU
-            // 3'b111: alu_type = `SLTU;//BGEU
-            // endcase
+            case(funct3)
+            3'b000: alu_type = `SUB;//BEQ
+            3'b001: alu_type = `SUB;//BNE
+            3'b100: alu_type = `SLT;//BLT
+            3'b101: alu_type = `SLT;//BGE
+            3'b110: alu_type = `SLTU;//BLTU
+            3'b111: alu_type = `SLTU;//BGEU
+            endcase
             alu_type = `ADD;
         end
         `INST_LUI:begin

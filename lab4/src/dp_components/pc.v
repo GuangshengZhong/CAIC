@@ -9,9 +9,7 @@ module PC (
     output reg [31:0] pc
 );
     always@(posedge clk, posedge rst)begin//posedge rst注意！
-        if(rst || bubble_if)begin
-            pc <= 32'b0;
-        end
+        if(rst || bubble_if) pc <= 32'b0;
         else begin
             if (stall_if) pc <= pc;
             else if(pc_src == 1'b1) pc<= new_pc;
