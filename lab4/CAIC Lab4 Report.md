@@ -24,7 +24,7 @@ Data_in出错->rs2_data_new出错->rs2_data出错（橙色是idmodule的）
 
 写寄存器改为在negedge
 
-尤其需要注意的是id的reg_write，有一个out是往后传，有一个in是后面送过来的。一开始弄混了，debug了好久啊啊啊！
+尤其需要注意的是id的reg_write，有一个out是往后传，有一个in是后面送过来的。一开始弄混了，debug了好久啊啊啊！找到这个bug之后除了branch（test3）都过了
 
 ### test 1
 
@@ -35,3 +35,11 @@ Data_in出错->rs2_data_new出错->rs2_data出错（橙色是idmodule的）
 
 
 现在是14ns的时候rs2_data的选择出错，在ex阶段
+
+### test 3
+
+极度痛苦
+
+无论是否跳转，只要指令是branch类型，均将reg_src置为1？
+
+257ns处 pc+4_if本该为60但是为04

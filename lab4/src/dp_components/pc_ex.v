@@ -11,6 +11,7 @@ module PC_EX(
     output reg pc_src,//0:+4;1:new
     output reg [31:0] new_pc
 );
+    reg [31:0] new_pc_temp;
     always@(*)begin
         if (jal) begin
             new_pc = pc + imm;
@@ -21,14 +22,16 @@ module PC_EX(
             pc_src = 1'b1;
         end
         else if(branch)begin
-            new_pc = pc + imm;
+            new_pc_temp = pc + imm;
+            pc_src = 1'b1;
             case(branch_type)
-            `BEQ: pc_src = zero;
-            `BNE: pc_src = ~zero;
-            `BLTU,`BLT: pc_src = less_than;
+            `BEQ: new_pc = zero ? new_pc_temp : pc_plus4;
+            `BNE: new_pc = (!zero) ? new_pc_temp : pc_plus4;
+            `BLTU,`BLT: new_pc = less_than ? new_pc_temp : pc_plus4;
             //`BLT: pc_src = ($signed(rs1_data)<$signed(rs2_data));
-            `BGEU, `BGE: pc_src = ~less_than;
+            `BGEU, `BGE: new_pc = (!less_than) ? new_pc_temp : pc_plus4;
             //`BGE: pc_src = !($signed(rs1_data)<$signed(rs2_data));
+            default: new_pc = pc_plus4;
         endcase end
         else begin
             pc_src = 1'b0;

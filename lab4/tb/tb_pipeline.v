@@ -2,7 +2,7 @@
 
 // for verification
 // you can change it to adjust which test code you want to run
-`define TEST_TYPE 8
+`define TEST_TYPE 3
 
 `include "src/riscv_top.v"
 
