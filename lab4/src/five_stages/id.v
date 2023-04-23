@@ -25,7 +25,7 @@ module ID_MODULE(
     output [4:0] rd, rs1, rs2,
     output branch, jal, jalr
 );
-    wire [2:0] funct3_inn;
+    wire [2:0] funct3_inn,branch_type_inn;
     wire [4:0] R_Addr1, R_Addr2, W_Addr;
     //wire [31:0] R_Data1_p, R_Data2_p;
     wire [31:0] rs1_data_old, rs2_data_old;
@@ -58,6 +58,7 @@ module ID_MODULE(
         .reg_write_enable(reg_write_out),
         .store_type(store_type),
         .reg_src(reg_src),
+        //.branch_type(branch_type_inn),
         .branch_type(branch_type),
         .load_type(load_type)
     );
@@ -99,6 +100,8 @@ module ID_MODULE(
         .alu_type(alu_type),
         .zero(zero), .less_than(less_than)
     );
+    
+    //assign branch_type = branch ? branch_type_inn : 'b0;
 
     PC_EX ID_PC_EX(
         .branch(branch_inn),.jal(jal_inn),.jalr(jalr_inn),

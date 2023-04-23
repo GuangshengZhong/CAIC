@@ -9,16 +9,17 @@ module ALUControl (
     //output reg [31:0] alu_op1, alu_op2,
     output reg [3:0] alu_type
 );
-    reg [6:0] opcode;
-    reg [2:0] funct3;
-    reg [6:0] funct7;
+    wire [6:0] opcode, funct7;
+    wire [2:0] funct3;
+    assign opcode = instr[6:0];
+    assign funct3 = instr[14:12];
+    assign funct7 = instr[31:25];
     always@(*) begin
-    opcode = instr[6:0];
-    funct3 = instr[14:12];
-    funct7 = instr[31:25];
+    // opcode = instr[6:0];
+    // funct3 = instr[14:12];
+    // funct7 = instr[31:25];
         case (opcode)
         `INST_TYPE_R: begin
-            funct7 = instr[31:25];
             alu_src1 = 1'b0;
             alu_src2 = 1'b0;
             // alu_op1 = R_Data1;
@@ -41,7 +42,7 @@ module ALUControl (
             // alu_op1 = R_Data1;
             // alu_op2 = imm;
             case (funct3)
-            3'b000: alu_type = `ADD;//ADDI
+            3'b000: alu_type = (funct7 == 7'b0 ) ? `ADD : `SUB;//ADDI
             3'b010: alu_type = `SLT;//SLTI
             3'b011: alu_type = `SLTU;//SLTIU
             3'b100: alu_type = `XOR;//XORI
@@ -79,8 +80,10 @@ module ALUControl (
             3'b101: alu_type = `SLT;//BGE
             3'b110: alu_type = `SLTU;//BLTU
             3'b111: alu_type = `SLTU;//BGEU
+            default: alu_type = `SUB;
             endcase
-            alu_type = `ADD;
+            // alu_type = `ADD;
+            // 这个改了之后对结果的04不产生影响
         end
         `INST_LUI:begin
             alu_src1 = 1'b0;
