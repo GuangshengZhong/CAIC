@@ -42,7 +42,7 @@ module ALUControl (
             // alu_op1 = R_Data1;
             // alu_op2 = imm;
             case (funct3)
-            3'b000: alu_type = (funct7 == 7'b0 ) ? `ADD : `SUB;//ADDI
+            3'b000: alu_type = `ADD;//ADDI
             3'b010: alu_type = `SLT;//SLTI
             3'b011: alu_type = `SLTU;//SLTIU
             3'b100: alu_type = `XOR;//XORI

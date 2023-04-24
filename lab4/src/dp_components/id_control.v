@@ -26,8 +26,8 @@ module ID_Control(
     //     `SLT: less_than = ($signed(rs1_data_update)<$signed(rs2_data_update));
     //     endcase
     // end 
-    assign rs1_data_update = (rs1_fwd_id == `FROM_MEM) ? reg_write_data_mem : rs1_data ;
-    assign rs2_data_update = (rs2_fwd_id == `FROM_MEM) ? reg_write_data_mem : rs2_data ;
+    // assign rs1_data_update = (rs1_fwd_id == `FROM_MEM) ? reg_write_data_mem : rs1_data ;
+    // assign rs2_data_update = (rs2_fwd_id == `FROM_MEM) ? reg_write_data_mem : rs2_data ;
     assign zero  = (rs1_data_update == rs2_data_update) ;
     // assign zero  = (alu_type == `SUB)? (rs1_data_update == rs2_data_update): zero ;
     assign less_than = ((funct3 == `BLTU)||(funct3 == `BGEU)) ? (rs1_data_update < rs2_data_update) : ($signed(rs1_data_update)<$signed(rs2_data_update));

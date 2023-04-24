@@ -119,8 +119,8 @@ module ID_MODULE(
         .new_pc(new_pc)
     );
 
-    assign rs1_data = rs1_data_new;
-    assign rs2_data = rs2_data_new;
+    assign rs1_data = rs1_data_old;
+    assign rs2_data = rs2_data_old;
     assign branch = branch_inn;
     assign jal = jal_inn;
     assign jalr = jalr_inn;
