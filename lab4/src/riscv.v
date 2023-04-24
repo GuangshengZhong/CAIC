@@ -21,9 +21,13 @@ module RISCVPipeline (
     output [31:0] instr_addr, mem_addr, mem_write_data
 );
     wire stall_if, bubble_if, stall_id, bubble_id, stall_ex, bubble_ex, stall_mem, bubble_mem, stall_wb, bubble_wb;
+    wire reg_write_wb;
+    wire [4:0] rd_wb;
     //IF
     wire pc_src;
+    // wire pc_src;
     wire [31:0] instr_if, pc_if, pc_plus4_if, new_pc;
+    wire [31:0] reg_write_data_mem_tp, reg_write_data_wb_tp;
 
     IF_MODULE if_module(
         .rst(rst), .clk(clk),
@@ -61,8 +65,8 @@ module RISCVPipeline (
         //From if
         .instr(instr_id),
         //From mem & wb
-        .reg_write_data_mem(reg_write_data_mem),
-        .reg_write_data_wb(reg_write_data_wb),
+        .reg_write_data_mem(reg_write_data_mem_tp),
+        .reg_write_data_wb(reg_write_data_wb_tp),
         //From if_id
         .pc(pc_id),.pc_plus4(pc_plus4_id),
         //To id_ex
@@ -76,7 +80,7 @@ module RISCVPipeline (
         .rd(rd_id),.rs1(rs1_id),.rs2(rs2_id),
         .rs1_data(rs1_data_id),.rs2_data(rs2_data_id),.imm(imm_id),
         .rd_wb(rd_wb),
-        .stall_id(stall_id), .bubble_id(bubble_id),
+        // .stall_id(stall_id), .bubble_id(bubble_id),
         //.branch_type(branch_type_id),.load_type(load_type_id), .store_type(store_type_id);
         //From fwd_unit_id
         .rs1_fwd_id(rs1_fwd_id),.rs2_fwd_id(rs2_fwd_id),
@@ -89,7 +93,7 @@ module RISCVPipeline (
     wire alu_src1_ex, alu_src2_ex;
     wire [31:0] pc_ex, pc_plus4_ex, rs1_data_ex, rs2_data_ex, imm_ex, alu_result_ex;
     wire [4:0] rs1_ex, rs2_ex, rd_ex;
-    wire [31:0] reg_write_data_mem, reg_write_data_wb;
+
     wire [1:0] rs1_fwd_ex, rs2_fwd_ex;
 
     wire mem_read_ex, mem_write_ex, reg_write_ex;
@@ -129,8 +133,8 @@ module RISCVPipeline (
         .rs2_data_ex_new(rs2_data_ex_new),
         .imm(imm_ex),
         //.rs1_ex(rs1_ex),rs2_ex(rs2_ex),
-        .reg_write_data_mem(reg_write_data_mem),
-        .reg_write_data_wb(reg_write_data_wb),
+        .reg_write_data_mem(reg_write_data_mem_tp),
+        .reg_write_data_wb(reg_write_data_wb_tp),
         .rs1_fwd_ex(rs1_fwd_ex),.rs2_fwd_ex(rs2_fwd_ex),
         .alu_result(alu_result_ex)
     );
@@ -181,7 +185,7 @@ module RISCVPipeline (
     assign write_type = instr_funct3_mem;
     assign load_type_mem = instr_funct3_mem;
 
-    assign reg_write_data_mem = (reg_src_mem == `FROM_ALU) ? alu_result_mem : ((reg_src_mem == `FROM_MEM)? mem2reg_data : ((reg_src_mem == `FROM_IMM)? imm_mem:pc_plus4_mem));
+    assign reg_write_data_mem_tp = (reg_src_mem == `FROM_ALU) ? alu_result_mem : ((reg_src_mem == `FROM_MEM)? mem2reg_data : ((reg_src_mem == `FROM_IMM)? imm_mem:pc_plus4_mem));
 
     MEM_MODULE mem_module(
         //From ex_mem
@@ -195,9 +199,7 @@ module RISCVPipeline (
         .mem_read_data(mem_read_data)
     );
     //WB
-    wire reg_write_wb;
     wire [1:0] reg_src_wb;
-    wire [4:0] rd_wb;
     wire [31:0] alu_result_wb, mem2reg_data_wb, imm_wb, nxpc_wb, pc_plus4_wb;
     MEM_WB mem_wb(
         .clk(clk),
@@ -222,7 +224,7 @@ module RISCVPipeline (
         .mem2reg_data(mem2reg_data_wb),
         .imm(imm_wb),.nxpc(nxpc_wb),
         .pc_plus4(pc_plus4_wb),
-        .reg_write_data(reg_write_data_wb)
+        .reg_write_data(reg_write_data_wb_tp)
     );
 
     //Hazard_detect_unit
