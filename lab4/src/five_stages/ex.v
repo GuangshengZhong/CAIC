@@ -14,7 +14,6 @@ module EX_MODULE(
     //output [4:0] rs1_ex, rs2_ex,
     //output [31:0] new_pc,
     //output reg [31:0] mem_addr,//???
-    //output [4:0] rs1_ex, rs2_ex,
     output pc_src
 );
     wire [31:0] op1, op2;

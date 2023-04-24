@@ -24,11 +24,6 @@ module IF_MODULE(
         .bubble_if(bubble_if),
         .pc(pc)
         );
-    // INSTMEM IF_INSTMEM(
-    //     .clk(clk),
-    //     .addr(pc),
-    //     .data_out(instr)
-    //     );
     Adder IF_ADD(
         .op_num1(pc),
         .op_num2(pc_incre),

@@ -6,7 +6,6 @@
 `include "src/dp_components/id_control.v"
 module ID_MODULE(
     input [31:0] instr,
-    //input [31:0] reg_write_data,//用_wb _mem代替？
     input [31:0] pc, pc_plus4,//for pc_ex
     input clk,
     input reg_write_in,
@@ -14,7 +13,6 @@ module ID_MODULE(
     input [31:0] reg_write_data_wb,//new
     input [1:0] rs1_fwd_id,rs2_fwd_id,
     input [4:0] rd_wb,//从wb传过来的
-    // input stall_id, bubble_id,
     output pc_src,
     output [1:0] reg_src, 
     output alu_src1, alu_src2,
@@ -42,7 +40,7 @@ module ID_MODULE(
     );
 
     wire reg_write_enable;
-    assign reg_write_enable = reg_write_in || rs1_fwd_id || rs2_fwd_id;//???
+    assign reg_write_enable = reg_write_in || rs1_fwd_id || rs2_fwd_id;
 
     ControlUnit ID_Control_Unit(
         .instr(instr), 
@@ -75,18 +73,11 @@ module ID_MODULE(
         .alu_type(alu_type)
     );
 
-    wire [31:0] reg_write_data_chosen;
-    wire [4:0] reg_write_addr;
-    // assign reg_write_data_chosen = (rs1_fwd_id||rs2_fwd_id) ? reg_write_data_mem : reg_write_data_wb;//加了stall之后好了！！
-    assign reg_write_data_chosen = reg_write_data_wb;
-    // assign reg_write_addr = rs1_fwd_id ? R_Addr1 : (rs2_fwd_id ? R_Addr2 : rd_wb);
-    assign reg_write_addr = rd_wb;
-
     RegFile ID_RegFile(
         .read_addr1(R_Addr1),
         .read_addr2(R_Addr2),
-        .reg_write_addr(reg_write_addr),
-        .reg_write_data(reg_write_data_chosen),//not sure
+        .reg_write_addr(rd_wb),
+        .reg_write_data(reg_write_data_wb),//not sure
         .clk(clk),
         .read_data1(rs1_data_old),
         .read_data2(rs2_data_old),
@@ -103,8 +94,6 @@ module ID_MODULE(
         .alu_type(alu_type),
         .zero(zero), .less_than(less_than)
     );
-    
-    //assign branch_type = branch ? branch_type_inn : 'b0;
 
     PC_EX ID_PC_EX(
         .branch(branch_inn),.jal(jal_inn),.jalr(jalr_inn),

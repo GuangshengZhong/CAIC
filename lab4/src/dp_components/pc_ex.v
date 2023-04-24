@@ -7,7 +7,6 @@ module PC_EX(
     input [31:0] rs1_data, //rs2_data,
     input [31:0] imm,
     input zero, less_than,
-    //input [31:0] alu_result,
     output reg pc_src,//0:+4;1:new
     output reg [31:0] new_pc
 );
@@ -28,9 +27,7 @@ module PC_EX(
             `BEQ: new_pc = zero ? new_pc_temp : pc_plus4;
             `BNE: new_pc = (!zero) ? new_pc_temp : pc_plus4;
             `BLTU,`BLT: new_pc = less_than ? new_pc_temp : pc_plus4;
-            //`BLT: pc_src = ($signed(rs1_data)<$signed(rs2_data));
             `BGEU, `BGE: new_pc = (!less_than) ? new_pc_temp : pc_plus4;
-            //`BGE: pc_src = !($signed(rs1_data)<$signed(rs2_data));
             default: new_pc = pc_plus4;
         endcase end
         else begin
