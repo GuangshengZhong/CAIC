@@ -14,6 +14,7 @@ module ID_MODULE(
     input [31:0] reg_write_data_wb,//new
     input [1:0] rs1_fwd_id,rs2_fwd_id,
     input [4:0] rd_wb,//从wb传过来的
+    input stall_id, bubble_id,
     output pc_src,
     output [1:0] reg_src, 
     output alu_src1, alu_src2,
@@ -76,7 +77,8 @@ module ID_MODULE(
 
     wire [31:0] reg_write_data_chosen;
     wire [4:0] reg_write_addr;
-    assign reg_write_data_chosen = (rs1_fwd_id||rs2_fwd_id) ? reg_write_data_mem : reg_write_data_wb;
+    assign reg_write_data_chosen = (rs1_fwd_id||rs2_fwd_id||stall_id) ? reg_write_data_mem : reg_write_data_wb;//加了stall之后好了！！
+    // assign reg_write_data_chosen = reg_write_data_wb;
     assign reg_write_addr = rs1_fwd_id ? R_Addr1 : (rs2_fwd_id ? R_Addr2 : rd_wb);
 
     RegFile ID_RegFile(
