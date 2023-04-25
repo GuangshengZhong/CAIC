@@ -11,6 +11,5 @@ module Forward_Unit_Id(
         else rs1_fwd_id = `NO_FWD;
         if(reg_write_mem&&branch_id&&(rd_mem!=5'b0)&&(rd_mem == rs2_id)) rs2_fwd_id = `FWD_MEM;
         else rs2_fwd_id = `NO_FWD;
-        //jal?
     end
 endmodule

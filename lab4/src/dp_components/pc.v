@@ -8,7 +8,7 @@ module PC (
     input [31:0] new_pc,
     output reg [31:0] pc
 );
-    always@(posedge clk, posedge rst)begin//posedge rst注意！
+    always@(posedge clk, posedge rst)begin
         if(rst || bubble_if) pc <= 32'b0;
         else begin
             if (stall_if) pc <= pc;
