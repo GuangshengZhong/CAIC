@@ -115,4 +115,4 @@ Data_in出错->rs2_data_new出错->rs2_data出错（橙色是idmodule的）
 
 提交id：5ff967926c3c
 
-![8011682342644_.pic](/Users/zhongzuoqi/Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/com.tencent.xinWeChat/2.0b4.0.9/25386a024f55b91f5b4b4859cc1a43d5/Message/MessageTemp/9e20f478899dc29eb19741386f9343c8/Image/8011682342644_.pic.jpg)
+<img src="/Users/zhongzuoqi/Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/com.tencent.xinWeChat/2.0b4.0.9/25386a024f55b91f5b4b4859cc1a43d5/Message/MessageTemp/9e20f478899dc29eb19741386f9343c8/Image/8011682342644_.pic.jpg" alt="8011682342644_.pic" style="zoom:50%;" />
