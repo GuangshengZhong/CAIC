@@ -54,6 +54,7 @@ module DataCache #(
 `endif
 
     // Used for memory read/write ports' unpack/pack
+    // 由于 Verilog 不支持使用 数组定义接口，我们还为大家提供了将主存的读写数据接口转换成以 word 为单位的数组的 解包/打包 代码
     reg [31:0] mem_write_line [0:LINE_SIZE-1];
     wire [31:0] mem_read_line [0:LINE_SIZE-1];
     genvar line;
@@ -66,20 +67,29 @@ module DataCache #(
     endgenerate
 
     // address translation
-    /*****************************************
-     *                                       *
-     *     FILL WITH YOUR IMPLEMENTATION     *
-     *                                       *
-     *****************************************/
+    /*****************************************/
+    wire word_addr = addr[WORD_ADDR_LEN - 1 : 0];
+    wire line_addr = addr[LINE_ADDR_LEN + WORD_ADDR_LEN - 1 : WORD_ADDR_LEN];
+    wire set_addr = addr[SET_ADDR_LEN + LINE_ADDR_LEN + WORD_ADDR_LEN - 1 : LINE_ADDR_LEN + WORD_ADDR_LEN];
+    wire tag_addr = addr[TAG_ADDR_LEN + SET_ADDR_LEN + LINE_ADDR_LEN + WORD_ADDR_LEN - 1 : SET_ADDR_LEN + LINE_ADDR_LEN + WORD_ADDR_LEN];
+    /*****************************************/
     
 
     // check whether current request hits cache line
     // if cache hits, record the way hit by this request
-    /*****************************************
-     *                                       *
-     *     FILL WITH YOUR IMPLEMENTATION     *
-     *                                       *
-     *****************************************/
+    /*****************************************/
+    reg hit;
+    reg [LINE_ADDR_LEN - 1 : 0] hit_way;
+    reg [SET_ADDR_LEN - 1 : 0] hit_set;
+    always @(posedge clk)
+    begin
+        hit = !(write_request || read_request) ? 0 : ((tag[set_addr][line_addr]==tag_addr)? 1:0);
+        if (hit) begin
+            hit_way = line_addr;
+            hit_set = set_addr;
+        end
+    end
+    /*****************************************/
 
 
 `ifdef LRU
