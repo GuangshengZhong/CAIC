@@ -18,7 +18,7 @@ module DataCache #(
     output reg request_finish,
     output reg [31:0] read_data,
     // ports between cache and main memory
-    output mem_read_request, mem_write_request, //主存读写请求端口
+    output reg mem_read_request, mem_write_request, //主存读写请求端口
     output [(32*(1<<LINE_ADDR_LEN)-1):0] mem_write_data,
     output [31:0] mem_addr, //主存地址端口、主存写数据端口
     input mem_request_finish, //主存请求完成端口
@@ -69,10 +69,10 @@ module DataCache #(
 
     // address translation
     /*****************************************/
-    wire word_addr = addr[WORD_ADDR_LEN - 1 : 0];
-    wire line_addr = addr[LINE_ADDR_LEN + WORD_ADDR_LEN - 1 : WORD_ADDR_LEN];
-    wire set_addr = addr[SET_ADDR_LEN + LINE_ADDR_LEN + WORD_ADDR_LEN - 1 : LINE_ADDR_LEN + WORD_ADDR_LEN];
-    wire tag_addr = addr[TAG_ADDR_LEN + SET_ADDR_LEN + LINE_ADDR_LEN + WORD_ADDR_LEN - 1 : SET_ADDR_LEN + LINE_ADDR_LEN + WORD_ADDR_LEN];
+    wire [WORD_ADDR_LEN - 1 : 0] word_addr = addr[WORD_ADDR_LEN - 1 : 0];
+    wire [LINE_ADDR_LEN - 1 : 0] line_addr = addr[LINE_ADDR_LEN + WORD_ADDR_LEN - 1 : WORD_ADDR_LEN];
+    wire [SET_ADDR_LEN - 1 : 0] set_addr = addr[SET_ADDR_LEN + LINE_ADDR_LEN + WORD_ADDR_LEN - 1 : LINE_ADDR_LEN + WORD_ADDR_LEN];
+    wire [TAG_ADDR_LEN - 1 : 0] tag_addr = addr[TAG_ADDR_LEN + SET_ADDR_LEN + LINE_ADDR_LEN + WORD_ADDR_LEN - 1 : SET_ADDR_LEN + LINE_ADDR_LEN + WORD_ADDR_LEN];
     /*****************************************/
     
 
@@ -81,13 +81,16 @@ module DataCache #(
     /*****************************************/
     reg hit;
     integer hit_way = -1;
+    reg [TAG_ADDR_LEN-1:0] tag_to_compare;
     always @(posedge clk or negedge clk) begin
         for (integer way = 0; way < WAY_CNT; way++)
          if(valid[set_addr][way]&&(tag[set_addr][way] == tag_addr))begin
+            tag_to_compare = tag[set_addr][way];
             hit = 1'b1;
             hit_way = way;
          end
          else begin
+            tag_to_compare = tag[set_addr][way];
             hit = 1'b0;
             hit_way = -1; //用负数标志
          end
@@ -171,7 +174,7 @@ module DataCache #(
                         if(read_request)
                         begin
                             /*****************************************/
-                            read_data <= cache_data[set_addr][hit_way][line_addr]
+                            read_data <= cache_data[set_addr][hit_way][line_addr];
                             request_finish <= 1'b1;
                              /*****************************************/
                         end
@@ -215,7 +218,7 @@ module DataCache #(
                                 else if(valid[set_addr][way])
                                     way_age[set_addr][way] <= way_age[set_addr][way];//为了不越界
                                 for (integer way = 0; way< WAY_CNT; way++)
-                                    if(valid[set_addr][way]&&(way_age[set_addr]>age_max))begin
+                                    if(valid[set_addr][way]&&(way_age[set_addr][way]>age_max))begin
                                         age_max = way_age [set_addr][way];
                                         age_max_way = way;
                                     end
@@ -249,7 +252,7 @@ module DataCache #(
                             else if(write_request) begin
                                 mem_read_request <= 1'b0;
                                 mem_write_request <= 1'b1;
-                                mem_write_line <= cache_data[set_addr][replace_way[set_addr]];
+                                // mem_write_line <= cache_data[set_addr][replace_way[set_addr]];
                                 mem_write_addr <= {tag[set_addr][replace_way[set_addr]], set_addr}; 
                             end
                         end
