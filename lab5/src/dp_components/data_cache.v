@@ -88,8 +88,8 @@ module DataCache #(
     reg [TAG_ADDR_LEN-1:0] tag_to_compare;
 
     // always @(posedge clk or negedge clk) begin
-    always @(posedge clk or negedge clk) begin
-        for (integer way = 0; way < WAY_CNT; way++)begin:hitlop
+    always @(posedge clk or negedge clk) begin:hitlop
+        for (integer way = 0; way < WAY_CNT; way++)begin
          if(valid[set_addr][way]&&(tag[set_addr][way] == tag_addr))begin
             tag_to_compare = tag[set_addr][way];
             hit = 1'b1;
