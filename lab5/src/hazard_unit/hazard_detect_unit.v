@@ -25,12 +25,12 @@ module Hazard_Detect_Unit(
 	
 	assign stall_if = stall;
 	assign stall_id = stall;//对if与id进行stall
-	assign stall_ex = 1'b0;
-	assign stall_mem = 1'b0;
-	assign stall_wb = 1'b0;
-	// assign stall_ex = miss;
-	// assign stall_mem = miss;
-	// assign stall_wb = miss;
+	// assign stall_ex = 1'b0;
+	// assign stall_mem = 1'b0;
+	// assign stall_wb = 1'b0;
+	assign stall_ex = miss;
+	assign stall_mem = miss;
+	assign stall_wb = miss;
 	
 	assign bubble_if = 1'b0;
 	assign bubble_id = bubble;
