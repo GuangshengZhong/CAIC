@@ -3,20 +3,6 @@
     `define MAX_AGE 32'h7fffffff
 `endif 
 
-module Hitter #(
-    parameter TAG_ADDR_LEN = 10
-)(
-    input valid,
-    input [TAG_ADDR_LEN-1:0] tag_to_compare,
-    input [TAG_ADDR_LEN-1:0] tag_addr,
-    input [7:0] way_i,
-    output [7:0] way_ok,
-    output hit_i
-);
-    assign hit_i = valid && (tag_to_compare == tag_addr);
-    assign way_ok = hit_i ? way_i : 0;
-endmodule
-
 module DataCache #(
     parameter LINE_ADDR_LEN = 3, // Each cache line has 2^LINE_ADDR_LEN words
     parameter SET_ADDR_LEN = 3, // This cache has 2^SET_ADDR_LEN cache sets
@@ -97,7 +83,7 @@ module DataCache #(
     // check whether current request hits cache line
     // if cache hits, record the way hit by this request
     /*****************************************/
-    reg hit;
+    wire hit;
     integer hit_way = -1;
     reg [TAG_ADDR_LEN-1:0] tag_to_compare;
 
@@ -119,23 +105,22 @@ module DataCache #(
         end
     end
     */
-    reg [WAY_CNT-1:0] hit_i;
-    reg [WAY_CNT-1:0] way_ok[7:0];
+    wire [WAY_CNT-1:0] hit_i;
+    wire [WAY_CNT-1:0] way_ok[7:0];
     genvar way;
     generate
-        for (way = 0; way < WAY_CNT; way = way + 1) begin
-            Hitter hitter_i(
-                .valid(valid[set_addr][way]),
-                .tag_to_compare(tag[set_addr][way]),
-                .tag_addr(tag_addr),
-                .way_i(way),
-                .way_ok(way_ok[way]),
-                .hit_i(hit_i[way])
-            );
+        for (way = 0; way < WAY_CNT; way = way + 1)begin:hitloop
+            assign hit_i[way] = (valid[set_addr][way]&&(tag[set_addr][way] == tag_addr));
         end
     endgenerate
     assign hit = |hit_i;
-    assign hit_way = hit ? way_ok.sum() : -1 ;
+    integer way_i;
+    always@(hit_i) begin
+        for(way_i = 0 ; way_i < WAY_CNT; way_i++)begin
+            if(hit_i[way_i])
+                hit_way = way_i;
+        end
+    end
     assign miss = (read_request || write_request) && !(hit && cache_state == READY);
     /*****************************************/
 
@@ -163,9 +148,12 @@ module DataCache #(
 
     //为了debug定义的一些东西
     wire [TAG_ADDR_LEN - 1 :0] tag_replace_in_now;
-    wire [31:0] replace_way_now;
+    wire [31:0] replace_in_way_now;
+    reg [31:0] replace_ready;
+    reg valid_ready, dirty_ready;
+    reg [SET_ADDR_LEN-1: 0] replace_set_ready;
     assign tag_replace_in_now = mem_read_tag_addr;
-    assign replace_way_now = replace_way[mem_read_set_addr];
+    assign replace_in_way_now = replace_way[mem_read_set_addr];
     reg now_valid = 0;
 
     // cache state machine update logic
@@ -246,6 +234,7 @@ module DataCache #(
                             `SW: begin
                                 cache_data[set_addr][hit_way][line_addr][31:0] <= write_data[31:0];
                             end
+                            default: cache_data[set_addr][hit_way][line_addr][31:0] <= write_data[31:0];
                             endcase
                             dirty[set_addr][hit_way] <= 1'b1;
                             request_finish <= 1'b1;
@@ -274,7 +263,6 @@ module DataCache #(
                                 age_max <=0; //进行一些个复原？
                             end
                         `endif
-                        cache_state <= READY;
                         /*****************************************/
                     end
 
@@ -285,8 +273,13 @@ module DataCache #(
                         if(write_request || read_request) begin
                             mem_read_request <= read_request;
                             mem_write_request <= write_request;
+                            replace_ready <= replace_way[set_addr];
+                            replace_set_ready <= set_addr;
+                            valid_ready <= valid[set_addr][replace_way[set_addr]];
+                            dirty_ready <= dirty[set_addr][replace_way[set_addr]];
                             if(valid[set_addr][replace_way[set_addr]] && dirty[set_addr][replace_way[set_addr]])begin
                                 cache_state <= REPLACE_OUT;
+                                replace_ready[16] = 1'b1;//这里从不置1，说明没进入过这层循环
                                 mem_write_addr <= {tag[set_addr][replace_way[set_addr]], set_addr}; 
                                 for(integer line = 0; line < LINE_SIZE; line++)
                                     mem_write_line[line] <= cache_data[set_addr][replace_way[set_addr]][line]; 
@@ -298,6 +291,7 @@ module DataCache #(
                             mem_read_set_addr <= set_addr;
                             mem_read_addr <= {mem_read_tag_addr, mem_read_set_addr};
                         end
+                        // else cache_state <= READY;
                         /*****************************************/
                     end
                 end 
@@ -337,7 +331,7 @@ module DataCache #(
                         else 
                             replace_way[mem_read_set_addr] <= replace_way[mem_read_set_addr]+1;
                         `endif
-                    end
+                    end 
                     /*****************************************/
                 end
 
