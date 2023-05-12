@@ -3,6 +3,20 @@
     `define MAX_AGE 32'h7fffffff
 `endif 
 
+module Hitter #(
+    parameter TAG_ADDR_LEN = 10
+)(
+    input valid,
+    input [TAG_ADDR_LEN-1:0] tag_to_compare,
+    input [TAG_ADDR_LEN-1:0] tag_addr,
+    input [7:0] way_i,
+    output [7:0] way_ok,
+    output hit_i
+);
+    assign hit_i = valid && (tag_to_compare == tag_addr);
+    assign way_ok = hit_i ? way_i : 0;
+endmodule
+
 module DataCache #(
     parameter LINE_ADDR_LEN = 3, // Each cache line has 2^LINE_ADDR_LEN words
     parameter SET_ADDR_LEN = 3, // This cache has 2^SET_ADDR_LEN cache sets
@@ -87,22 +101,41 @@ module DataCache #(
     integer hit_way = -1;
     reg [TAG_ADDR_LEN-1:0] tag_to_compare;
 
-    // always @(posedge clk or negedge clk) begin
+    /*
     always @(posedge clk or negedge clk) begin:hitlop
+    //always @(*) begin:hitlop
         for (integer way = 0; way < WAY_CNT; way++)begin
          if(valid[set_addr][way]&&(tag[set_addr][way] == tag_addr))begin
             tag_to_compare = tag[set_addr][way];
-            hit = 1'b1;
-            hit_way = way;
+            hit <= 1'b1;
+            hit_way <= way;
             disable hitlop;
          end
          else begin
-            tag_to_compare = tag[set_addr][way];
-            hit = 1'b0;
-            hit_way = -1; //用负数标志
+            tag_to_compare <= tag[set_addr][way];
+            hit <= 1'b0;
+            hit_way <= -1; //用负数标志
          end
         end
     end
+    */
+    reg [WAY_CNT-1:0] hit_i;
+    reg [WAY_CNT-1:0] way_ok[7:0];
+    genvar way;
+    generate
+        for (way = 0; way < WAY_CNT; way = way + 1) begin
+            Hitter hitter_i(
+                .valid(valid[set_addr][way]),
+                .tag_to_compare(tag[set_addr][way]),
+                .tag_addr(tag_addr),
+                .way_i(way),
+                .way_ok(way_ok[way]),
+                .hit_i(hit_i[way])
+            );
+        end
+    endgenerate
+    assign hit = |hit_i;
+    assign hit_way = hit ? way_ok.sum() : -1 ;
     assign miss = (read_request || write_request) && !(hit && cache_state == READY);
     /*****************************************/
 
