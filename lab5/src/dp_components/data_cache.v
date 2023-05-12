@@ -19,6 +19,7 @@ module DataCache #(
     output reg [31:0] read_data,
     // ports between cache and main memory
     output reg mem_read_request, mem_write_request, //主存读写请求端口
+    //output mem_read_request, mem_write_request, //主存读写请求端口
     output [(32*(1<<LINE_ADDR_LEN)-1):0] mem_write_data,
     output [31:0] mem_addr, //主存地址端口、主存写数据端口
     input mem_request_finish, //主存请求完成端口
@@ -84,27 +85,28 @@ module DataCache #(
     // if cache hits, record the way hit by this request
     /*****************************************/
     wire hit;
+    //reg hit;
     integer hit_way = -1;
     reg [TAG_ADDR_LEN-1:0] tag_to_compare;
 
-    /*
-    always @(posedge clk or negedge clk) begin:hitlop
-    //always @(*) begin:hitlop
-        for (integer way = 0; way < WAY_CNT; way++)begin
-         if(valid[set_addr][way]&&(tag[set_addr][way] == tag_addr))begin
-            tag_to_compare = tag[set_addr][way];
-            hit <= 1'b1;
-            hit_way <= way;
-            disable hitlop;
-         end
-         else begin
-            tag_to_compare <= tag[set_addr][way];
-            hit <= 1'b0;
-            hit_way <= -1; //用负数标志
-         end
-        end
-    end
-    */
+    
+    // always @(posedge clk or negedge clk) begin:hitlop
+    // //always @(*) begin:hitlop
+    //     for (integer way = 0; way < WAY_CNT; way++)begin
+    //      if(valid[set_addr][way]&&(tag[set_addr][way] == tag_addr))begin
+    //         tag_to_compare = tag[set_addr][way];
+    //         hit <= 1'b1;
+    //         hit_way <= way;
+    //         disable hitlop;
+    //      end
+    //      else begin
+    //         tag_to_compare <= tag[set_addr][way];
+    //         hit <= 1'b0;
+    //         hit_way <= -1; //用负数标志
+    //      end
+    //     end
+    // end
+    
     wire [WAY_CNT-1:0] hit_i;
     wire [WAY_CNT-1:0] way_ok[7:0];
     genvar way;
@@ -121,7 +123,7 @@ module DataCache #(
                 hit_way = way_i;
         end
     end
-    assign miss = (read_request || write_request) && !(hit && cache_state == READY);
+    assign miss = (read_request || write_request) && ((!(hit && cache_state === READY))||!request_finish);
     /*****************************************/
 
 
@@ -144,6 +146,9 @@ module DataCache #(
     reg [ MEM_ADDR_LEN - 1 : 0] mem_read_addr = 0;
     reg [ MEM_ADDR_LEN -1 : 0 ] mem_write_addr = 0;
     assign mem_addr = mem_read_request ? mem_read_addr : (mem_write_request ? mem_write_addr : 0); 
+    //assign mem_write_request = (cache_state == REPLACE_OUT);
+    //assign mem_read_request = (cache_state == REPLACE_IN);
+    //assign mem_read_addr = {addr[31:LINE_ADDR_LEN+WORD_ADDR_LEN],{(LINE_ADDR_LEN+WORD_ADDR_LEN){1'b0}}};
     /*****************************************/
 
     //为了debug定义的一些东西
@@ -243,6 +248,7 @@ module DataCache #(
                         else
                         begin
                             read_data <= 32'h00000000;
+                            //request_finish <= 1'b0;
                         end
                         // update cache age and replace way for LRU
                         /*****************************************/
@@ -264,6 +270,7 @@ module DataCache #(
                             end
                         `endif
                         /*****************************************/
+                        cache_state <= READY;
                     end
 
                     else //not hit
@@ -271,8 +278,9 @@ module DataCache #(
                         // if current request does not hit, change cache state
                         /*****************************************/
                         if(write_request || read_request) begin
-                            mem_read_request <= read_request;
-                            mem_write_request <= write_request;
+                            request_finish <= 1'b0;
+                            mem_read_request = read_request;
+                            mem_write_request = write_request;
                             replace_ready <= replace_way[set_addr];
                             replace_set_ready <= set_addr;
                             valid_ready <= valid[set_addr][replace_way[set_addr]];
@@ -280,16 +288,17 @@ module DataCache #(
                             if(valid[set_addr][replace_way[set_addr]] && dirty[set_addr][replace_way[set_addr]])begin
                                 cache_state <= REPLACE_OUT;
                                 replace_ready[16] = 1'b1;//这里从不置1，说明没进入过这层循环
-                                mem_write_addr <= {tag[set_addr][replace_way[set_addr]], set_addr}; 
+                                mem_write_addr <= {{(UNUSED_ADDR_LEN){1'b0}},tag[set_addr][replace_way[set_addr]], set_addr, {{LINE_ADDR_LEN+WORD_ADDR_LEN}{1'b0}}}; 
                                 for(integer line = 0; line < LINE_SIZE; line++)
                                     mem_write_line[line] <= cache_data[set_addr][replace_way[set_addr]][line]; 
                             end
                             else begin
-                                cache_state <= REPLACE_IN;
+                                 cache_state <= REPLACE_IN;
                             end
                             mem_read_tag_addr <= tag_addr;
                             mem_read_set_addr <= set_addr;
-                            mem_read_addr <= {mem_read_tag_addr, mem_read_set_addr};
+                            //mem_read_addr <= {mem_read_tag_addr, mem_read_set_addr};
+                            mem_read_addr <= {addr[31:LINE_ADDR_LEN+WORD_ADDR_LEN],{(LINE_ADDR_LEN+WORD_ADDR_LEN){1'b0}}};
                         end
                         // else cache_state <= READY;
                         /*****************************************/
@@ -304,7 +313,7 @@ module DataCache #(
                     // mem_write_line <= cache_data[set_addr][replace_way[set_addr]];
                     // mem_write_addr <= {tag[set_addr][replace_way[set_addr]], set_addr}; //这两行放到原来的周期里
                     if(mem_request_finish)begin
-                        cache_state <= REPLACE_IN;
+                         cache_state <= REPLACE_IN;
                     end
                     /*****************************************/
                 end 
