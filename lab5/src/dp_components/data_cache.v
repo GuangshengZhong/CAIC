@@ -85,29 +85,8 @@ module DataCache #(
     // if cache hits, record the way hit by this request
     /*****************************************/
     wire hit;
-    // reg hit;
     integer hit_way = -1;
     reg [TAG_ADDR_LEN-1:0] tag_to_compare;
-
-    /*
-    //always @(posedge clk or negedge clk) begin:hitlop
-    always @(*) begin:hitlop
-        for (integer way = 0; way < WAY_CNT; way++)begin
-         if(valid[set_addr][way]&&(tag[set_addr][way] == tag_addr))begin
-            tag_to_compare = tag[set_addr][way];
-            hit <= 1'b1;
-            hit_way <= way;
-            disable hitlop;
-         end
-         else begin
-            tag_to_compare <= tag[set_addr][way];
-            hit <= 1'b0;
-            hit_way <= -1; //用负数标志
-         end
-        end
-    end
-    */
-    
     
     wire [WAY_CNT-1:0] hit_i;
     wire [WAY_CNT-1:0] way_ok[7:0];
@@ -128,6 +107,8 @@ module DataCache #(
     end
     
 
+
+
     // assign miss = (read_request || write_request) && ((!(hit && cache_state === READY))||!request_finish);
     assign miss = ((read_request || write_request)&&(!request_finish));
     /*****************************************/
@@ -137,9 +118,9 @@ module DataCache #(
 `ifdef LRU
     // combination logic to choose the way with max age
     /*****************************************/
-    integer age_max;
-    integer age_max_way;
-    //似乎不太方便用组合逻辑
+    reg[31:0] age_max;
+    reg[31:0] age_max_way;
+    //在READY中更新age后使用组合逻辑进行判断
     /*****************************************/
 `endif
 
@@ -149,7 +130,6 @@ module DataCache #(
     //reg  [ SET_ADDR_LEN - 1 : 0] mem_read_set_addr = 0;
     //reg  [ TAG_ADDR_LEN - 1 : 0] mem_read_tag_addr = 0;
     wire [ 31 : 0] mem_read_addr;
-    // reg [ MEM_ADDR_LEN - 1 : 0] mem_read_addr = 0;
     reg [ 31 : 0 ] mem_write_addr = 0;
     assign mem_addr = mem_read_request ? mem_read_addr : (mem_write_request ? mem_write_addr : 0); 
     assign mem_write_request = (cache_state == REPLACE_OUT);
@@ -158,14 +138,14 @@ module DataCache #(
     /*****************************************/
 
     //为了debug定义的一些东西
-    wire [TAG_ADDR_LEN - 1 :0] tag_replace_in_now;
-    wire [31:0] replace_in_way_now;
-    reg [31:0] replace_ready;
-    reg valid_ready, dirty_ready;
-    reg [SET_ADDR_LEN-1: 0] replace_set_ready;
+    //wire [TAG_ADDR_LEN - 1 :0] tag_replace_in_now;
+    //wire [31:0] replace_in_way_now;
+    //reg [31:0] replace_ready;
+    //reg valid_ready, dirty_ready;
+    //reg [SET_ADDR_LEN-1: 0] replace_set_ready;
     //assign tag_replace_in_now = mem_read_tag_addr;
     //assign replace_in_way_now = replace_way[mem_read_set_addr];
-    reg now_valid = 0;
+    //reg now_valid = 0;
 
     // cache state machine update logic
     integer i, j, k;
@@ -191,6 +171,8 @@ module DataCache #(
                     dirty[i][j] <= 1'b0;
                     `ifdef LRU
                     way_age[i][j] <= `MAX_AGE;
+                    age_max <= 0;
+                    age_max_way <=0;
                     `endif 
                 end
             end
@@ -261,21 +243,23 @@ module DataCache #(
                         // update cache age and replace way for LRU
                         /*****************************************/
                         `ifdef LRU
-                            if (read_request||write_request)begin
+                            if ((read_request||write_request)&&!request_finish)begin
                                 for(integer way = 0; way < WAY_CNT; way++)
                                 if(way == hit_way)
                                     way_age[set_addr][way] <= 0;
-                                else if(valid[set_addr][way])
-                                    way_age[set_addr][way] <= way_age[set_addr][way];//为了不越界
-                                for (integer way = 0; way< WAY_CNT; way++)
-                                    if(valid[set_addr][way]&&(way_age[set_addr][way]>age_max))begin
-                                        age_max = way_age [set_addr][way];
-                                        age_max_way = way;
+                                else if(way_age[set_addr][way] < `MAX_AGE)
+                                    way_age[set_addr][way] <= way_age[set_addr][way]+1;//为了不越界
+                                else way_age[set_addr][way] <= way_age[set_addr][way];
+                            end        
+                            age_max = 0;
+                            for (i = 0; i <WAY_CNT; i++)begin:oldlop
+                                if(way_age[set_addr][i] > age_max)
+                                    begin
+                                        age_max = way_age[set_addr][i];
+                                        age_max_way = i;
                                     end
-                                replace_way[set_addr] <= age_max_way;
-                                age_max_way <=0;
-                                age_max <=0; //进行一些个复原？
                             end
+                            replace_way[set_addr] <= age_max_way;
                         `endif
                         /*****************************************/
                         // cache_state <= READY;
@@ -290,13 +274,13 @@ module DataCache #(
                             request_finish <= 1'b0;
                             //mem_read_request <= read_request;//!!!!!!!!
                             //mem_write_request <= write_request;//改成阻塞或者非阻塞，很有不同
-                            replace_ready <= replace_way[set_addr];
-                            replace_set_ready <= set_addr;
-                            valid_ready <= valid[set_addr][replace_way[set_addr]];
-                            dirty_ready <= dirty[set_addr][replace_way[set_addr]];
+                            // replace_ready <= replace_way[set_addr];
+                            // replace_set_ready <= set_addr;
+                            // valid_ready <= valid[set_addr][replace_way[set_addr]];
+                            // dirty_ready <= dirty[set_addr][replace_way[set_addr]];
                             if(valid[set_addr][replace_way[set_addr]] && dirty[set_addr][replace_way[set_addr]])begin
                                 cache_state <= REPLACE_OUT;
-                                replace_ready[16] = 1'b1;//这里从不置1，说明没进入过这层循环
+                                // replace_ready[16] = 1'b1;//这里从不置1，说明没进入过这层循环
                                 mem_write_addr <= {{(UNUSED_ADDR_LEN){1'b0}},tag[set_addr][replace_way[set_addr]], set_addr, {(LINE_ADDR_LEN+WORD_ADDR_LEN){1'b0}}}; 
                                 for(integer line = 0; line < LINE_SIZE; line++)
                                     mem_write_line[line] <= cache_data[set_addr][replace_way[set_addr]][line]; 
@@ -321,9 +305,6 @@ module DataCache #(
                 begin
                     // switch to REPLACE_IN when memory write finishes
                     /*****************************************/
-                    
-                    // mem_write_line <= cache_data[set_addr][replace_way[set_addr]];
-                    // mem_write_addr <= {tag[set_addr][replace_way[set_addr]], set_addr}; //这两行放到原来的周期里
                     // mem_read_request <= 1'b0;
                     // mem_write_request <= 1'b1;
                     if(mem_request_finish)begin
@@ -349,12 +330,12 @@ module DataCache #(
                         dirty[set_addr][replace_way[set_addr]] <= 1'b0;
                         cache_state <= READY;
                         `ifdef LRU
+                            // do nothing
                         `else
-                        // replace_way[mem_read_set_addr] <= (replace_way[mem_read_set_addr] + 1) % WAY_CNT;
-                        if(replace_way[set_addr] == WAY_CNT - 1)
-                            replace_way[set_addr] <= 0;
-                        else 
-                            replace_way[set_addr] <= replace_way[set_addr]+1;
+                            if(replace_way[set_addr] == WAY_CNT - 1)
+                                replace_way[set_addr] <= 0;
+                            else 
+                                replace_way[set_addr] <= replace_way[set_addr]+1;
                         `endif
                     end 
                     request_finish <= 1'b0;
