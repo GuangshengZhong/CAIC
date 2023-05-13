@@ -129,7 +129,7 @@ module DataCache #(
     
 
     // assign miss = (read_request || write_request) && ((!(hit && cache_state === READY))||!request_finish);
-    assign miss = ((read_request || write_request) && (!(hit && cache_state == READY)))||((read_request || write_request)&&(!request_finish));
+    assign miss = ((read_request || write_request)&&(!request_finish));
     /*****************************************/
 
 
@@ -146,15 +146,15 @@ module DataCache #(
 
     // interact with memory interface when cache miss/replacement occurs
     /*****************************************/
-    reg  [ SET_ADDR_LEN - 1 : 0] mem_read_set_addr = 0;
-    reg  [ TAG_ADDR_LEN - 1 : 0] mem_read_tag_addr = 0;
-    // wire [   MEM_ADDR_LEN - 1 : 0] mem_read_addr = {mem_read_tag_addr, mem_read_set_addr};
-    reg [ MEM_ADDR_LEN - 1 : 0] mem_read_addr = 0;
-    reg [ MEM_ADDR_LEN -1 : 0 ] mem_write_addr = 0;
+    //reg  [ SET_ADDR_LEN - 1 : 0] mem_read_set_addr = 0;
+    //reg  [ TAG_ADDR_LEN - 1 : 0] mem_read_tag_addr = 0;
+    wire [ 31 : 0] mem_read_addr;
+    // reg [ MEM_ADDR_LEN - 1 : 0] mem_read_addr = 0;
+    reg [ 31 : 0 ] mem_write_addr = 0;
     assign mem_addr = mem_read_request ? mem_read_addr : (mem_write_request ? mem_write_addr : 0); 
     assign mem_write_request = (cache_state == REPLACE_OUT);
     assign mem_read_request = (cache_state == REPLACE_IN);
-    //assign mem_read_addr = {addr[31:LINE_ADDR_LEN+WORD_ADDR_LEN],{(LINE_ADDR_LEN+WORD_ADDR_LEN){1'b0}}};
+    assign mem_read_addr = {addr[31:LINE_ADDR_LEN+WORD_ADDR_LEN],{(LINE_ADDR_LEN+WORD_ADDR_LEN){1'b0}}};
     /*****************************************/
 
     //为了debug定义的一些东西
@@ -163,8 +163,8 @@ module DataCache #(
     reg [31:0] replace_ready;
     reg valid_ready, dirty_ready;
     reg [SET_ADDR_LEN-1: 0] replace_set_ready;
-    assign tag_replace_in_now = mem_read_tag_addr;
-    assign replace_in_way_now = replace_way[mem_read_set_addr];
+    //assign tag_replace_in_now = mem_read_tag_addr;
+    //assign replace_in_way_now = replace_way[mem_read_set_addr];
     reg now_valid = 0;
 
     // cache state machine update logic
@@ -211,20 +211,18 @@ module DataCache #(
                     begin
                         // notify CPU whether the request can be finished
                         /*****************************************/
-                        
+                        if(write_request || read_request) 
+                            request_finish <= !request_finish;
                         /*****************************************/
 
                         // update cache data
                         // for read request, fetch corresponding data
                         // for write request, dirty bit should also be updated
-                        if(request_finish)begin
-                            request_finish <= 1'b0;
-                        end
-                        else if(read_request)
+                        if(read_request)
                         begin
                             /*****************************************/
                             read_data <= cache_data[set_addr][hit_way][line_addr];
-                            request_finish <= 1'b1;
+                            //request_finish <= 1'b1;
                             //request_finish <= 1'b0;
                             /*****************************************/
                         end
@@ -252,13 +250,13 @@ module DataCache #(
                             default: cache_data[set_addr][hit_way][line_addr][31:0] <= write_data[31:0];
                             endcase
                             dirty[set_addr][hit_way] <= 1'b1;
-                            request_finish <= 1'b1;
+                            //request_finish <= 1'b1;
                             /*****************************************/
                         end
                         else
                         begin
                             read_data <= 32'h00000000;
-                            request_finish <= 1'b0;
+                            //request_finish <= 1'b0;
                         end
                         // update cache age and replace way for LRU
                         /*****************************************/
@@ -299,18 +297,19 @@ module DataCache #(
                             if(valid[set_addr][replace_way[set_addr]] && dirty[set_addr][replace_way[set_addr]])begin
                                 cache_state <= REPLACE_OUT;
                                 replace_ready[16] = 1'b1;//这里从不置1，说明没进入过这层循环
-                                mem_write_addr <= {{(UNUSED_ADDR_LEN){1'b0}},tag[set_addr][replace_way[set_addr]], set_addr, {{LINE_ADDR_LEN+WORD_ADDR_LEN}{1'b0}}}; 
+                                mem_write_addr <= {{(UNUSED_ADDR_LEN){1'b0}},tag[set_addr][replace_way[set_addr]], set_addr, {(LINE_ADDR_LEN+WORD_ADDR_LEN){1'b0}}}; 
                                 for(integer line = 0; line < LINE_SIZE; line++)
                                     mem_write_line[line] <= cache_data[set_addr][replace_way[set_addr]][line]; 
                             end
                             else begin
                                 cache_state <= REPLACE_IN;
                             end
-                            mem_read_tag_addr <= tag_addr;
-                            mem_read_set_addr <= set_addr;
+                            // mem_read_tag_addr <= tag_addr;
+                            // mem_read_set_addr <= set_addr;
                             //mem_read_addr <= {mem_read_tag_addr, mem_read_set_addr};
-                            mem_read_addr <= {addr[31:LINE_ADDR_LEN+WORD_ADDR_LEN],{(LINE_ADDR_LEN+WORD_ADDR_LEN){1'b0}}};
+                            // mem_read_addr <= {addr[31:LINE_ADDR_LEN+WORD_ADDR_LEN],{(LINE_ADDR_LEN+WORD_ADDR_LEN){1'b0}}};
                         end
+                        request_finish <= 1'b0;
                         // else cache_state <= READY;
                         /*****************************************/
                     end
@@ -344,18 +343,18 @@ module DataCache #(
                     // mem_write_request <= 1'b0;
                     if(mem_request_finish)begin
                         for(integer i = 0; i < LINE_SIZE; i++ )
-                            cache_data[mem_read_set_addr][replace_way[mem_read_set_addr]][i] <= mem_read_line[i];
-                        tag[mem_read_set_addr][replace_way[mem_read_set_addr]] <= mem_read_tag_addr;
-                        valid[mem_read_set_addr][replace_way[mem_read_set_addr]] <= 1'b1;
-                        dirty[mem_read_set_addr][replace_way[mem_read_set_addr]] <= 1'b0;
+                            cache_data[set_addr][replace_way[set_addr]][i] <= mem_read_line[i];
+                        tag[set_addr][replace_way[set_addr]] <= tag_addr;
+                        valid[set_addr][replace_way[set_addr]] <= 1'b1;
+                        dirty[set_addr][replace_way[set_addr]] <= 1'b0;
                         cache_state <= READY;
                         `ifdef LRU
                         `else
                         // replace_way[mem_read_set_addr] <= (replace_way[mem_read_set_addr] + 1) % WAY_CNT;
-                        if(replace_way[mem_read_set_addr] == WAY_CNT - 1)
-                            replace_way[mem_read_set_addr] <= 0;
+                        if(replace_way[set_addr] == WAY_CNT - 1)
+                            replace_way[set_addr] <= 0;
                         else 
-                            replace_way[mem_read_set_addr] <= replace_way[mem_read_set_addr]+1;
+                            replace_way[set_addr] <= replace_way[set_addr]+1;
                         `endif
                     end 
                     request_finish <= 1'b0;

@@ -4,7 +4,7 @@
 //`define LRU 1 // comment out this macro to close LRU replacement policy
 
 // you can change it to adjust which test code you want to run
-`define TEST_TYPE 4
+`define TEST_TYPE 3
 
 // define the problem size
 `define MATMUL_SIZE 32
