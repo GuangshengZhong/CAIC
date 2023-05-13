@@ -265,7 +265,7 @@ module RISCVPipeline # (
         .rs1_id(rs1_id), .rs2_id(rs2_id), 
         .rd_mem(rd_mem), .rd_ex(rd_ex),
         //.mem_read_ex(mem_read_ex), .mem_read_mem(mem_read_mem),.reg_write_ex(reg_write_ex),//需要改成cache_read_mem么？
-        .mem_read_ex(mem_read_ex), .mem_read_mem(cache_read_mem),.reg_write_ex(reg_write_ex),
+        .mem_read_ex(mem_read_ex), .mem_read_mem(cache_read_mem),.reg_write_ex(reg_write_ex),.mem_read_id(mem_read_id),
         .stall_if(stall_if), .bubble_if(bubble_if),
         .stall_id(stall_id), .bubble_id(bubble_id),
         .stall_ex(stall_ex), .bubble_ex(bubble_ex),

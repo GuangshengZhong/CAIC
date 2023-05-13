@@ -129,7 +129,7 @@ module DataCache #(
     
 
     // assign miss = (read_request || write_request) && ((!(hit && cache_state === READY))||!request_finish);
-    assign miss = ((read_request || write_request) && (!(hit && cache_state === READY)))||((read_request || write_request)&&(!request_finish));
+    assign miss = ((read_request || write_request) && (!(hit && cache_state == READY)))||((read_request || write_request)&&(!request_finish));
     /*****************************************/
 
 
@@ -217,12 +217,16 @@ module DataCache #(
                         // update cache data
                         // for read request, fetch corresponding data
                         // for write request, dirty bit should also be updated
-                        if(read_request)
+                        if(request_finish)begin
+                            request_finish <= 1'b0;
+                        end
+                        else if(read_request)
                         begin
                             /*****************************************/
                             read_data <= cache_data[set_addr][hit_way][line_addr];
                             request_finish <= 1'b1;
-                             /*****************************************/
+                            //request_finish <= 1'b0;
+                            /*****************************************/
                         end
                         else if(write_request)
                         begin
@@ -254,7 +258,7 @@ module DataCache #(
                         else
                         begin
                             read_data <= 32'h00000000;
-                            // request_finish <= 1'b1;
+                            request_finish <= 1'b0;
                         end
                         // update cache age and replace way for LRU
                         /*****************************************/
@@ -281,6 +285,7 @@ module DataCache #(
 
                     else //not hit
                     begin
+                        // read_data <= 32'b0;
                         // if current request does not hit, change cache state
                         /*****************************************/
                         if(write_request || read_request) begin
@@ -304,7 +309,7 @@ module DataCache #(
                             mem_read_tag_addr <= tag_addr;
                             mem_read_set_addr <= set_addr;
                             //mem_read_addr <= {mem_read_tag_addr, mem_read_set_addr};
-                            mem_read_addr = {addr[31:LINE_ADDR_LEN+WORD_ADDR_LEN],{(LINE_ADDR_LEN+WORD_ADDR_LEN){1'b0}}};
+                            mem_read_addr <= {addr[31:LINE_ADDR_LEN+WORD_ADDR_LEN],{(LINE_ADDR_LEN+WORD_ADDR_LEN){1'b0}}};
                         end
                         // else cache_state <= READY;
                         /*****************************************/
@@ -342,7 +347,6 @@ module DataCache #(
                             cache_data[mem_read_set_addr][replace_way[mem_read_set_addr]][i] <= mem_read_line[i];
                         tag[mem_read_set_addr][replace_way[mem_read_set_addr]] <= mem_read_tag_addr;
                         valid[mem_read_set_addr][replace_way[mem_read_set_addr]] <= 1'b1;
-                        now_valid <= 1'b1;
                         dirty[mem_read_set_addr][replace_way[mem_read_set_addr]] <= 1'b0;
                         cache_state <= READY;
                         `ifdef LRU

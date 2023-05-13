@@ -4,8 +4,9 @@ module Hazard_Detect_Unit(
     input pc_src_id,jal_id,jalr_id,branch_id,
     input [4:0] rs1_id,rs2_id,
     input [4:0] rd_mem, rd_ex,
-    input mem_read_ex, mem_read_mem, reg_write_ex,
+    input mem_read_ex, mem_read_mem, reg_write_ex, mem_read_id,
 	input miss,
+	// input request_finish,
     output stall_if, bubble_if,
     output stall_id, bubble_id,
     output stall_ex, bubble_ex,
@@ -20,11 +21,12 @@ module Hazard_Detect_Unit(
 	// ||(jalr_id&&((rd_mem == rs1_id )||(rd_ex == rs1_id))&&(rs1_id!=0)));//jalr stall
 
 	//assign stall = (branch_id || jalr_id) && ((reg_write_ex&&((rd_ex == rs1_id )||(rd_ex == rs2_id)))||(mem_read_mem&&((rd_mem == rs1_id)||(rd_mem == rs2_id))));
-	assign stall = ((branch_id || jalr_id) && ((reg_write_ex&&((rd_ex == rs1_id )||(rd_ex == rs2_id)))||(mem_read_mem&&((rd_mem == rs1_id)||(rd_mem == rs2_id)))))||miss;
+	assign stall = (branch_id || jalr_id) && ((reg_write_ex&&((rd_ex == rs1_id )||(rd_ex == rs2_id)))||(mem_read_mem&&((rd_mem == rs1_id)||(rd_mem == rs2_id))));
+	//||(mem_read_ex&&((rd_ex == rs1_id)||(rd_ex == rs2_id)))
 	assign bubble = (branch_id || jalr_id || jal_id);
 	
-	assign stall_if = stall;
-	assign stall_id = stall;//对if与id进行stall
+	assign stall_if = stall||miss;
+	assign stall_id = stall||miss;//对if与id进行stall
 	// assign stall_ex = 1'b0;
 	// assign stall_mem = 1'b0;
 	// assign stall_wb = 1'b0;
