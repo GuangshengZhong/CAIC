@@ -1,10 +1,10 @@
 `timescale 1ns/1ns
 
 // for verification
-`define LRU 1 // comment out this macro to close LRU replacement policy
+//`define LRU 1 // comment out this macro to close LRU replacement policy
 
 // you can change it to adjust which test code you want to run
-`define TEST_TYPE 3
+`define TEST_TYPE 4
 
 // define the problem size
 `define MATMUL_SIZE 32
