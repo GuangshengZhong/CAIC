@@ -10,9 +10,6 @@ module SystolicArray #(
     input [31:0] row_index,
     output [ARRAY_SIZE*DATA_WIDTH-1:0] results
 );
-
-
-
     // receive each PE's output
     wire [DATA_WIDTH-1:0] results_unpacked[0:ARRAY_SIZE-1][0:ARRAY_SIZE-1];
     // pack the outputs of selected row
@@ -23,6 +20,5 @@ module SystolicArray #(
             assign results[(ARRAY_SIZE-j)*DATA_WIDTH-1 : (ARRAY_SIZE-j-1)*DATA_WIDTH] = (read_enable && (row_index<ARRAY_SIZE)) ? results_unpacked[row_index][j] : 0;
         end
     endgenerate
-
-    #TODO
+    
 endmodule
