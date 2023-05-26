@@ -14,10 +14,16 @@ module PE #(
             result <= 0;
         end
         else begin
-            if(accumulate_enable)
+            if(accumulate_enable) begin
                 result <= result + input_north * input_west;
-            else
+                output_south <= input_north;
+                output_east <= input_west;
+            end
+            else begin
                 result <= result;
+                output_south <= output_south;
+                output_east <= output_east;
+            end
         end
     end
 endmodule
