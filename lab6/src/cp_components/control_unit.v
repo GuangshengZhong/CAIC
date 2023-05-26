@@ -79,6 +79,26 @@ module ControlUnit (
             reg_write_enable = 1'b1;
             reg_src = `FROM_PC;
         end
+        // ISA extension
+        `INST_ACC:begin
+            branch = 1'b0; jal = 1'b0; jalr = 1'b0;
+            case(funct3)
+            `LOAD:begin
+                mem_read = 1'b1; mem_write = 1'b0;
+                reg_write_enable = 1'b1;
+                reg_src = `FROM_MEM;
+            end
+            `SAVE:begin
+                mem_read = 1'b0; mem_write = 1'b1;
+                reg_write_enable = 1'b0;
+                reg_src = `FROM_MEM;
+            end
+            `MATMUL:
+            `RESET:
+            `MOVE:
+            default:
+            endcase
+        end
         default:begin
             branch = 1'b0; jal = 1'b0; jalr = 1'b0;
             mem_read = 1'b0; mem_write = 1'b0;

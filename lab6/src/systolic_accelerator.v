@@ -45,7 +45,7 @@ module SystolicAccelerator #(
     //FIFOBuffers
     reg [DATA_WIDTH-1:0] west_fifo_output_data[0:ARRAY_SIZE-1];
     reg [DATA_WIDTH-1:0] north_fifo_output_data[0:ARRAY_SIZE-1];
-    reg [ARRAY_SIZE*DATA_WIDTH-1:0] west_inputs, north_inputs;
+    wire [ARRAY_SIZE*DATA_WIDTH-1:0] west_inputs, north_inputs;
     genvar i;
     generate
         for (i = 0; i< ARRAY_SIZE ; i = i+1)begin
@@ -65,8 +65,8 @@ module SystolicAccelerator #(
                 .buffer_input(north_fifo_input_data),
                 .buffer_output(north_fifo_output_data[i])
             );
-            assign west_inputs[(i+1)*DATA_WIDTH-1:i*DATA_WIDTH] = west_fifo_output_data[i];
-            assign north_inputs[(i+1)*DATA_WIDTH-1:i*DATA_WIDTH] = north_fifo_output_data[i];
+            assign west_inputs[(ARRAY_SIZE-i)*DATA_WIDTH-1:(ARRAY_SIZE-i-1)*DATA_WIDTH] = west_fifo_output_data[i];
+            assign north_inputs[(ARRAY_SIZE-i)*DATA_WIDTH-1:(ARRAY_SIZE-i-1)*DATA_WIDTH] = north_fifo_output_data[i];
         end
     endgenerate
 
