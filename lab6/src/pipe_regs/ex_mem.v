@@ -15,6 +15,9 @@ module EX_MEM(
     output [1:0] reg_src_mem,
     output [2:0] instr_funct3_mem,
     output [4:0] rd_mem, //[4:0]??
+    //ISA ext
+    input accelerator_instr_ex,
+    output accelerator_instr_mem,
     // To Memory
     output mem_write, 
     output [2:0] write_type,
@@ -28,6 +31,7 @@ module EX_MEM(
     PipeDff #(1) EX_MEM_mem_write(.clk(clk),.bubble(bubble_mem),.stall(stall_mem),.default_val(1'b0),.data_in(mem_write_ex),.data_out(mem_write_mem));
     PipeDff #(1) EX_MEM_reg_write(.clk(clk),.bubble(bubble_mem),.stall(stall_mem),.default_val(1'b0),.data_in(reg_write_ex),.data_out(reg_write_mem));
     PipeDff #(1) EX_MEM_mem_read(.clk(clk),.bubble(bubble_mem),.stall(stall_mem),.default_val(1'b0),.data_in(mem_read_ex),.data_out(mem_read_mem));
+    PipeDff #(1) EX_MEM_mem_read(.clk(clk),.bubble(bubble_mem),.stall(stall_mem),.default_val(1'b0),.data_in(accelerator_instr_ex),.data_out(accelerator_instr_mem));
 
     PipeDff #(3) EX_MEM_instr_funct3(.clk(clk),.bubble(bubble_mem),.stall(stall_mem),.default_val(`SB),.data_in(instr_funct3_ex),.data_out(instr_funct3_mem));
     PipeDff #(5) EX_MEM_rd(.clk(clk),.bubble(bubble_mem),.stall(stall_mem),.default_val(`ZERO_REG),.data_in(rd_ex),.data_out(rd_mem));

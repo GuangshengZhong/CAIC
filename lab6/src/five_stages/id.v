@@ -13,6 +13,7 @@ module ID_MODULE(
     input [31:0] reg_write_data_wb,//new
     input [1:0] rs1_fwd_id,rs2_fwd_id,
     input [4:0] rd_wb,//从wb传过来的
+    output accelerator_instr,// for ISA extension
     output pc_src,
     output [1:0] reg_src, 
     output alu_src1, alu_src2,
@@ -59,7 +60,8 @@ module ID_MODULE(
         .reg_src(reg_src),
         //.branch_type(branch_type_inn),
         .branch_type(branch_type),
-        .load_type(load_type)
+        .load_type(load_type),
+        .accelerator_instr(accelerator_instr)
     );
 
     ALUControl ID_ALU_Control(

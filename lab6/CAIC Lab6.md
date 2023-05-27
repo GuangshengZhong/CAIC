@@ -1,4 +1,4 @@
-# CAIC Lab6
+# CAIC Lab6 Report
 
 ## 1 Systolic Array
 
@@ -9,3 +9,12 @@
 <img src="/Users/zhongzuoqi/Library/Application Support/typora-user-images/image-20230526165229738.png" alt="image-20230526165229738" style="zoom:50%;" />
 
 第一次输出时发现输出的是ref矩阵的转置，将原先的`.result(results_unpacked[i][j])`改成`result(results_unpacked[j][i])`即输出正确结果。
+
+## 2 Bus 连接
+
+### `riscv.v`文件
+
+riscv.v中的data_bus_request_finish与data_bus_read_data是没有给出进一步的连接的
+
+- data_bus_request_finish在riscv_top.v接的是mem_request_finish
+

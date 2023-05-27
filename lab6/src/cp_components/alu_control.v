@@ -114,6 +114,13 @@ module ALUControl (
             // alu_op1 = R_Data1;
             // alu_op2 = imm;
         end
+        `INST_ACC:begin//直接用的L与S 的type
+            alu_src1 = 1'b0;
+            alu_src2 = 1'b1;
+            // alu_op1 = R_Data1;
+            // alu_op2 = imm;
+            alu_type = `ADD;
+        end
         endcase
     end
 

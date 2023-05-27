@@ -11,6 +11,8 @@ module ID_EX(
     input [3:0] alu_type_id,
     input [4:0] rd_id, rs1_id, rs2_id,
     input stall_ex, bubble_ex,
+    input accelerator_instr_id,
+    output accelerator_instr_ex,
     output mem_read_ex, mem_write_ex, reg_write_ex,
     output alu_src1_ex, alu_src2_ex,
     output [31:0] pc_plus4_ex, pc_ex,
@@ -43,6 +45,7 @@ module ID_EX(
     PipeDff #(1) ID_EX_mem_read(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(mem_read_id),.data_out(mem_read_ex));
     PipeDff #(1) ID_EX_alu_src2(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(alu_src2_id),.data_out(alu_src2_ex));
     PipeDff #(1) ID_EX_jal(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(jal_id),.data_out(jal_ex));
+    PipeDff #(1) ID_EX_jal(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(accelerator_instr_id),.data_out(accelerator_instr_ex));
 
 
 endmodule

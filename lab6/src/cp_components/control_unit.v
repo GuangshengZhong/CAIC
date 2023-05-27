@@ -9,6 +9,7 @@ module ControlUnit (
     output reg [1:0] reg_src,
     output [2:0] branch_type,
     output [2:0] load_type,
+    output accelerator_instr,
     output reg branch, jal, jalr,
     output reg mem_read, mem_write, reg_write_enable
 );
@@ -17,6 +18,7 @@ module ControlUnit (
     assign branch_type = funct3;
     assign load_type = funct3;
     assign store_type = funct3;
+    assign accelerator_instr = (opcode==`INST_ACC);
     always@(*) begin
     opcode = instr[6:0];
     funct3 = instr[14:12];
@@ -82,22 +84,44 @@ module ControlUnit (
         // ISA extension
         `INST_ACC:begin
             branch = 1'b0; jal = 1'b0; jalr = 1'b0;
+            reg_src = `FROM_MEM;
+            mem_read = (funct3 == `LOAD);
+            reg_write_enable = (funct3 == `LOAD);
+            mem_write = (funct3 == `SAVE);
+            /*
             case(funct3)
-            `LOAD:begin
-                mem_read = 1'b1; mem_write = 1'b0;
-                reg_write_enable = 1'b1;
-                reg_src = `FROM_MEM;
-            end
-            `SAVE:begin
-                mem_read = 1'b0; mem_write = 1'b1;
-                reg_write_enable = 1'b0;
-                reg_src = `FROM_MEM;
-            end
-            `MATMUL:
-            `RESET:
-            `MOVE:
-            default:
+                `LOAD:begin
+                    mem_read = 1'b1; mem_write = 1'b0;
+                    reg_write_enable = 1'b1;
+                    reg_src = `FROM_MEM;
+                end
+                `SAVE:begin
+                    mem_read = 1'b0; mem_write = 1'b1;
+                    reg_write_enable = 1'b0;
+                    reg_src = `FROM_MEM;
+                end
+                `MATMUL:begin
+                    mem_read = 1'b0; mem_write = 1'b0;
+                    reg_write_enable = 1'b0;
+                    reg_src = `FROM_MEM;
+                end
+                `RESET:begin
+                    mem_read = 1'b0; mem_write = 1'b0;
+                    reg_write_enable = 1'b0;
+                    reg_src = `FROM_MEM;
+                end
+                `MOVE:begin
+                    mem_read = 1'b0; mem_write = 1'b0;
+                    reg_write_enable = 1'b0;
+                    reg_src = `FROM_MEM;
+                end
+                default:begin
+                    mem_read = 1'b0; mem_write = 1'b0;
+                    reg_write_enable = 1'b0;
+                    reg_src = `FROM_MEM;
+                end
             endcase
+            */
         end
         default:begin
             branch = 1'b0; jal = 1'b0; jalr = 1'b0;

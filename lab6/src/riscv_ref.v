@@ -304,10 +304,6 @@ module RISCVPipeline (
         .reg_write_data(reg_write_data_wb)
     );
 
-
-
-
-
     // hazard handling units
     ForwardUnitID forward_unit_id(
         .branch_id(branch_id), .jal_id(jal_id), .jalr_id(jalr_id),

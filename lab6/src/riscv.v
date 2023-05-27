@@ -35,7 +35,7 @@ module RISCVPipeline (
 
     // wires for accelerator ISA extension
     // instruction indication signal
-    wire accelerator_instr_id, accelerator_instr_ex, accelerator_instr_mem;
+    wire accelerator_instr_id, accelerator_instr_ex, accelerator_instr_mem;//√
     // wires for signal muxing between accelerator instruction and RISC-V memory instruction
     // accelerator bus wires
     wire accelerator_bus_read_request, accelerator_bus_write_request, accelerator_bus_request_finish;
@@ -59,6 +59,7 @@ module RISCVPipeline (
     // we need to leave a cycle for the IF stage to fetch the correct instruction
     reg accelerator_request_finish;
     wire accelerator_request_finish_wire;
+    assign accelerator_request_finish_wire = accelerator_take_up_bus && data_bus_request_finish;
 
     //IF
     wire pc_src;
@@ -184,7 +185,16 @@ module RISCVPipeline (
         .alu_result(alu_result_ex)
     );
 
-    
+    //MEM
+    wire mem_read_mem, mem_write_mem, reg_write_mem;
+    wire cache_read_mem, cache_write_mem;
+    wire [1:0] reg_src_mem;
+    wire [2:0] instr_funct3_mem, load_type_mem;
+    wire [4:0] rd_mem;
+    wire [31:0] imm_mem, rs2_data_mem, alu_result_mem, pc_plus4_mem, mem2reg_data;
+    wire [2:0] write_type;
+    wire [31:0] cache_addr;
+
     EX_MEM ex_mem(
         //From id_ex
         .clk(clk),
@@ -200,7 +210,7 @@ module RISCVPipeline (
         // for ISA extension
         .accelerator_instr_ex(accelerator_instr_ex),
         //To mem_module
-        .mem_read_mem(cache_read_mem),.mem_write_mem(cache_write_mem),
+        .mem_read_mem(mem_read_mem),.mem_write_mem(mem_write_mem),
         .instr_funct3_mem(instr_funct3_mem),
         .rs2_data_mem(rs2_data_mem),
         .alu_result_mem(alu_result_mem),
@@ -217,8 +227,6 @@ module RISCVPipeline (
         // for ISA extension
         .accelerator_instr_mem(accelerator_instr_mem)
     );
-    // assign mem_write_request = cache_write_mem;
-    // assign mem_read_request = cache_read_mem;
     assign write_type = instr_funct3_mem;
     assign load_type_mem = instr_funct3_mem;
 
@@ -226,7 +234,10 @@ module RISCVPipeline (
     
 
     // maintain the state register of accelerator request finish
-    #TODO
+    // TODO
+    wire miss, cache_miss, bus_not_finish;
+    assign bus_not_finish = (data_bus_read_request||data_bus_write_request)&&(!data_bus_request_finish);
+    assign miss = cache_miss||bus_not_finish;
 
     // logic for accelerator ISA extension
     // judge whether to take up the bus for the accelerator
@@ -238,19 +249,21 @@ module RISCVPipeline (
     assign data_bus_write_request = accelerator_take_up_bus ? accelerator_bus_write_request : mem_write_request;
     assign data_bus_write_data = accelerator_take_up_bus ? accelerator_bus_write_data : mem_write_data;
     assign data_bus_addr = accelerator_take_up_bus ? accelerator_bus_addr : mem_addr;
-    #TODO
+    
+    //TODO
+    assign data_bus_read_data = accelerator_take_up_bus? accelerator_bus_read_data : mem_read_data;
 
     // memory access stage is partially executed outside the logic module
-    wire miss;
+    wire cache_request_finish;
     DataCache #(.LINE_ADDR_LEN(LINE_ADDR_LEN)) data_cache(
         .clk(clk),.rst(rst),.debug(debug),
         // cache <-> cpu
-        .read_request(cache_read_mem),.write_request(cache_write_mem),
+        .read_request(mem_read_mem),.write_request(mem_write_mem),
         .write_type(write_type),
         .addr(cache_addr),
         .write_data(cache_write_data),
-        .miss(miss),
-        .request_finish(request_finish),//?
+        .miss(cache_miss),
+        .request_finish(cache_request_finish),//?
         .read_data(cache_read_data),
         //cache <-> maim_mem
         .mem_read_request(mem_read_request), .mem_write_request(mem_write_request),
@@ -265,10 +278,8 @@ module RISCVPipeline (
     );
     MEM_MODULE mem_module(
         //From ex_mem
-        .mem_read(cache_read_mem),
-        .load_type(load_type_mem),//???
-        //还有一堆信号干嘛去了？？
-        //.reg_write_data_mem(reg_write_data_mem),
+        .mem_read(mem_read_mem),
+        .load_type(load_type_mem),
         //To mem_wb
         .mem2reg_data(mem2reg_data),
         //From memory
@@ -308,9 +319,6 @@ module RISCVPipeline (
         .reg_write_data(reg_write_data_wb_tp)
     );
 
-
-
-
      //Forward_unit_id
     Forward_Unit_Id forward_unit_id(
         .jal_id(jal_id), .jalr_id(jalr_id), .branch_id(branch_id),
@@ -336,18 +344,21 @@ module RISCVPipeline (
         .jal_id(jal_id), .jalr_id(jalr_id), .branch_id(branch_id),
         .rs1_id(rs1_id), .rs2_id(rs2_id), 
         .rd_mem(rd_mem), .rd_ex(rd_ex),
-        //.mem_read_ex(mem_read_ex), .mem_read_mem(mem_read_mem),.reg_write_ex(reg_write_ex),//需要改成cache_read_mem么？
-        .mem_read_ex(mem_read_ex), .mem_read_mem(cache_read_mem),.reg_write_ex(reg_write_ex),.mem_read_id(mem_read_id),
-        .stall_if(stall_if), .bubble_if(bubble_if),
-        .stall_id(stall_id), .bubble_id(bubble_id),
-        .stall_ex(stall_ex), .bubble_ex(bubble_ex),
-        .stall_mem(stall_mem), .bubble_mem(bubble_mem),
-        .stall_wb(stall_wb), .bubble_wb(bubble_wb),
-        .miss(miss)
+        //.mem_read_ex(mem_read_ex), .mem_read_mem(mem_read_mem),.reg_write_ex(reg_write_ex),
+        .mem_read_ex(mem_read_ex), .mem_read_mem(mem_read_mem),.reg_write_ex(reg_write_ex),.mem_read_id(mem_read_id),
+        .cache_request_finish(cache_request_finish),
+        //for bus
+        .data_bus_request_finish(data_bus_request_finish),
         // for accelerator ISA extension
         .accelerator_instr_mem(accelerator_instr_mem), 
         .accelerator_request_finish(accelerator_request_finish),
         .instr_funct3_mem(instr_funct3_mem),
+        //output
+        .stall_if(stall_if), .bubble_if(bubble_if),
+        .stall_id(stall_id), .bubble_id(bubble_id),
+        .stall_ex(stall_ex), .bubble_ex(bubble_ex),
+        .stall_mem(stall_mem), .bubble_mem(bubble_mem),
+        .stall_wb(stall_wb), .bubble_wb(bubble_wb)
     );
     
 endmodule

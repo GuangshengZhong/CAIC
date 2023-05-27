@@ -129,7 +129,6 @@ module RISCVSoC (
         .BUS_PACKET_WIDTH(BUS_DATA_WIDTH)
     ) systolic_accelerator(
         .clk(clk), .rst(rst), .debug(debug),
-        
         .bus_slave_input(systolic_slave_write_data),
         .bus_slave_addr(systolic_slave_addr),
         .bus_slave_read_request(systolic_slave_read_request), .bus_slave_write_request(systolic_slave_write_request),
