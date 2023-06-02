@@ -12,9 +12,7 @@
 
 ## 2 Bus 连接
 
-### `riscv.v`文件
+### two Masters 如何连接
 
-riscv.v中的data_bus_request_finish与data_bus_read_data是没有给出进一步的连接的
 
-- data_bus_request_finish在riscv_top.v接的是mem_request_finish
 

@@ -59,7 +59,13 @@ module RISCVPipeline (
     // we need to leave a cycle for the IF stage to fetch the correct instruction
     reg accelerator_request_finish;
     wire accelerator_request_finish_wire;
-    assign accelerator_request_finish_wire = accelerator_take_up_bus && data_bus_request_finish;
+    accelerator_request_finish_wire = accelerator_take_up_bus && slave_request_finish;
+    always@(*)begin
+        if(negedge accelerator_take_up_bus)
+            accelerator_request_finish = accelerator_request_finish_wire;
+        else if(accelerator_request_finish)
+            accelerator_request_finish <= 0;
+    end
 
     //IF
     wire pc_src;
