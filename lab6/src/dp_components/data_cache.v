@@ -132,7 +132,10 @@ module DataCache #(
     //reg  [ TAG_ADDR_LEN - 1 : 0] mem_read_tag_addr = 0;
     wire [ 31 : 0] mem_read_addr;
     reg [ 31 : 0 ] mem_write_addr = 0;
-    assign mem_addr = mem_read_request ? mem_read_addr : (mem_write_request ? mem_write_addr : 0); 
+    // assign mem_addr = mem_read_request ? mem_read_addr : (mem_write_request ? mem_write_addr : 0); 
+    wire [31:0] mem_addr_local;
+    assign mem_addr_local = mem_read_request ? mem_read_addr : (mem_write_request ? mem_write_addr : 0); 
+    assign mem_addr = mem_addr_local + `DATA_MEM_BASE_ADDR;
     assign mem_write_request = (cache_state == REPLACE_OUT);
     assign mem_read_request = (cache_state == REPLACE_IN);
     assign mem_read_addr = {addr[31:LINE_ADDR_LEN+WORD_ADDR_LEN],{(LINE_ADDR_LEN+WORD_ADDR_LEN){1'b0}}};

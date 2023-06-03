@@ -11,7 +11,7 @@
 `include "src/pipe_regs/mem_wb.v"
 `include "src/hazard_unit/forward_unit_id.v"
 `include "src/hazard_unit/forward_unit_ex.v"
-`include "src/hazard_unit/stall_flush_detect_unit.v"
+`include "src/hazard_unit/hazard_detect_unit.v"
 // add cache in Lab 5
 `include "src/dp_components/data_cache.v"
 
@@ -35,17 +35,17 @@ module RISCVPipeline (
 
     // wires for accelerator ISA extension
     // instruction indication signal
-    wire accelerator_instr_id, accelerator_instr_ex, accelerator_instr_mem;//√
+    wire accelerator_instr_id, accelerator_instr_ex, accelerator_instr_mem;
     // wires for signal muxing between accelerator instruction and RISC-V memory instruction
     // accelerator bus wires
     wire accelerator_bus_read_request, accelerator_bus_write_request, accelerator_bus_request_finish;
     wire [31:0] accelerator_bus_addr;
     wire [(32*(1<<LINE_ADDR_LEN)-1):0] accelerator_bus_write_data, accelerator_bus_read_data;
     // accelerator cache wires
-    wire accelerator_cache_read_request, accelerator_cache_write_request, accelerator_cache_request_finish;
+    // wire accelerator_cache_read_request, accelerator_cache_write_request, accelerator_cache_request_finish;
     wire [(32*(1<<LINE_ADDR_LEN)-1):0] accelerator_cache_write_data, accelerator_cache_read_data;
     // cache wires, need to be muxed between accelerator and memory
-    wire cache_read_request, cache_write_request, cache_request_from_accelerator;
+    // wire cache_read_request, cache_write_request, cache_request_from_accelerator;
     wire [(32*(1<<LINE_ADDR_LEN)-1):0] cache_write_line_data, cache_read_line_data;
     wire [2:0] cache_write_type;
     wire [31:0] cache_write_data;
@@ -59,13 +59,7 @@ module RISCVPipeline (
     // we need to leave a cycle for the IF stage to fetch the correct instruction
     reg accelerator_request_finish;
     wire accelerator_request_finish_wire;
-    accelerator_request_finish_wire = accelerator_take_up_bus && slave_request_finish;
-    always@(*)begin
-        if(negedge accelerator_take_up_bus)
-            accelerator_request_finish = accelerator_request_finish_wire;
-        else if(accelerator_request_finish)
-            accelerator_request_finish <= 0;
-    end
+    
 
     //IF
     wire pc_src;
@@ -234,6 +228,7 @@ module RISCVPipeline (
         .accelerator_instr_mem(accelerator_instr_mem)
     );
     assign write_type = instr_funct3_mem;
+    
     assign load_type_mem = instr_funct3_mem;
 
     assign reg_write_data_mem_tp = (reg_src_mem == `FROM_ALU) ? alu_result_mem : ((reg_src_mem == `FROM_MEM)? mem2reg_data : ((reg_src_mem == `FROM_IMM)? imm_mem:pc_plus4_mem));
@@ -257,7 +252,22 @@ module RISCVPipeline (
     assign data_bus_addr = accelerator_take_up_bus ? accelerator_bus_addr : mem_addr;
     
     //TODO
-    assign data_bus_read_data = accelerator_take_up_bus? accelerator_bus_read_data : mem_read_data;
+        //accelerator <-> cpu
+    wire [2:0] acc_funct3;
+    assign acc_funct3 = instr_funct3_mem;
+    assign accelerator_bus_read_request = ((acc_funct3==`SAVE)||(acc_funct3 == `LOAD)||(acc_funct3 == `RESET)||(acc_funct3 == `MOVE));
+    assign accelerator_bus_write_request = ((acc_funct3==`LOAD)||(acc_funct3 == `LOAD)||(acc_funct3 == `RESET)||(acc_funct3 == `MOVE));
+    assign accelerator_bus_write_data = accelerator_instr_mem && cache_read_data;//???
+    always@(*)begin
+        case(acc_funct3)
+            `LOAD, `SAVE, `RESET: accelerator_bus_addr = cache_addr + `ACCELERATOR_MEM_BASE_ADDR; // 是用cache_addr加还是用mem_addr加？
+            `MATMUL: accelerator_bus_addr = `ACCELERATOR_MEM_BASE_ADDR + `OUTPUT_BUFFER_BASE_ADDR;
+            `MOVE: accelerator_bus_addr = `ACCELERATOR_MEM_BASE_ADDR + `MOVE;
+            default: accelerator_bus_addr = `ACCELERATOR_MEM_BASE_ADDR;
+        endcase
+    end
+        //cache <-> cpu
+
 
     // memory access stage is partially executed outside the logic module
     wire cache_request_finish;

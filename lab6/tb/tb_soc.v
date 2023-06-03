@@ -2,7 +2,7 @@
 
 // for verification
 // you can change it to adjust which test code you want to run
-`define TEST_TYPE 4
+`define TEST_TYPE 0
 // define the problem size
 `define QUICKSORT_SIZE 532
 

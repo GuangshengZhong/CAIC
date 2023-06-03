@@ -45,7 +45,7 @@ module ID_EX(
     PipeDff #(1) ID_EX_mem_read(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(mem_read_id),.data_out(mem_read_ex));
     PipeDff #(1) ID_EX_alu_src2(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(alu_src2_id),.data_out(alu_src2_ex));
     PipeDff #(1) ID_EX_jal(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(jal_id),.data_out(jal_ex));
-    PipeDff #(1) ID_EX_jal(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(accelerator_instr_id),.data_out(accelerator_instr_ex));
+    PipeDff #(1) ID_EX_accelerator_instr(.clk(clk),.bubble(bubble_ex),.stall(stall_ex),.default_val(1'b0),.data_in(accelerator_instr_id),.data_out(accelerator_instr_ex));
 
 
 endmodule

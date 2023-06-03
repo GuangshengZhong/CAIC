@@ -86,8 +86,8 @@ module ControlUnit (
             branch = 1'b0; jal = 1'b0; jalr = 1'b0;
             reg_src = `FROM_MEM;
             reg_write_enable = 1'b0;//??
-            mem_read = (funct3 == `SAVE)||(funct3 == `LOAD)||(funct3 == `RESET)||(funct3 == `MOVE);
-            mem_write = (funct3 == `LOAD)||(funct3 == `MATMUL)||(funct3 == `RESET)||(funct3 == `MOVE);
+            mem_read = (funct3 == `LOAD);
+            mem_write = (funct3 == `SAVE);
             /*
             case(funct3)
                 `LOAD:begin
