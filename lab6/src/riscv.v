@@ -91,7 +91,8 @@ module RISCVPipeline (
 
     IF_ID if_id(
         .clk(clk),
-        .instr_if(instr_if),
+        //.instr_if(instr_if),
+        .instr_if(instr),
         .pc_if(pc_if), .pc_plus4_if(pc_plus4_if),
         .instr_id(instr_id), 
         .pc_id(pc_id), .pc_plus4_id(pc_plus4_id),
@@ -277,7 +278,8 @@ module RISCVPipeline (
         // cache <-> cpu
         .read_request(mem_read_mem),.write_request(mem_write_mem),
         .write_type(write_type),
-        .addr(cache_addr),
+        //.addr(cache_addr),
+        .slave_addr(cache_addr),
         .write_data(cache_write_data),
         .miss(cache_miss),
         .request_finish(cache_request_finish),//?

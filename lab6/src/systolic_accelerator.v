@@ -71,7 +71,7 @@ module SystolicAccelerator #(
         end
     endgenerate
 
-    SystolicArray SystolicArrayModule(
+    SystolicArray systolic_array(
         .clk(clk),.rst(rst),
         .accumulate_enable(systolic_accumulate_enable),
         .read_enable(systolic_read_enable),
