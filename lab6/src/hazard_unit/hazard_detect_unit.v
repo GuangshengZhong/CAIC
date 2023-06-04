@@ -12,7 +12,11 @@ module Hazard_Detect_Unit(
     output stall_id, bubble_id,
     output stall_ex, bubble_ex,
     output stall_mem, bubble_mem,
-    output stall_wb, bubble_wb
+    output stall_wb, bubble_wb,
+	//for ISA extend
+	input [2:0] instr_funct3_mem,
+	input accelerator_instr_mem,
+	input accelerator_request_finish
 );
 	wire stall;
 	wire bubble; 

@@ -39,13 +39,13 @@ module RISCVPipeline (
     // wires for signal muxing between accelerator instruction and RISC-V memory instruction
     // accelerator bus wires
     wire accelerator_bus_read_request, accelerator_bus_write_request, accelerator_bus_request_finish;
-    wire [31:0] accelerator_bus_addr;
+    reg [31:0] accelerator_bus_addr;
     wire [(32*(1<<LINE_ADDR_LEN)-1):0] accelerator_bus_write_data, accelerator_bus_read_data;
     // accelerator cache wires
     // wire accelerator_cache_read_request, accelerator_cache_write_request, accelerator_cache_request_finish;
     wire [(32*(1<<LINE_ADDR_LEN)-1):0] accelerator_cache_write_data, accelerator_cache_read_data;
     // cache wires, need to be muxed between accelerator and memory
-    // wire cache_read_request, cache_write_request, cache_request_from_accelerator;
+    wire cache_read_request, cache_write_request, cache_request_from_accelerator;
     wire [(32*(1<<LINE_ADDR_LEN)-1):0] cache_write_line_data, cache_read_line_data;
     wire [2:0] cache_write_type;
     wire [31:0] cache_write_data;
@@ -75,7 +75,7 @@ module RISCVPipeline (
         .pc(pc_if)//??
     );
     // instruction fetch is executed outside logic module
-    wire [31:0] cache_write_data, cache_read_data;
+    wire [31:0] cache_read_data;
     assign instr_if = bubble_if ? `INST_NOP : instr;
     assign instr_addr = pc_if;
     assign cache_write_data = rs2_data_mem;
@@ -123,7 +123,7 @@ module RISCVPipeline (
         //From fwd_unit_id
         .rs1_fwd_id(rs1_fwd_id),.rs2_fwd_id(rs2_fwd_id),
         //To hazard & To if
-        .pc_src(pc_src),.new_pc(new_pc)//??
+        .pc_src(pc_src),.new_pc(new_pc),//??
         // for ISA extension
         .accelerator_instr(accelerator_instr_id)
     ); 
@@ -164,7 +164,7 @@ module RISCVPipeline (
         .instr_funct3_ex(instr_funct3_ex),
         .reg_src_ex(reg_src_ex),
         .rd_ex(rd_ex),
-        .pc_plus4_ex(pc_plus4_ex)
+        .pc_plus4_ex(pc_plus4_ex),
         // for ISA extension
         .accelerator_instr_ex(accelerator_instr_ex)
     );
@@ -223,7 +223,7 @@ module RISCVPipeline (
         .mem_addr(cache_addr),
         //To mem_wb
         .reg_write_mem(reg_write_mem),.rd_mem(rd_mem),
-        .imm_mem(imm_mem),.pc_plus4_mem(pc_plus4_mem)
+        .imm_mem(imm_mem),.pc_plus4_mem(pc_plus4_mem),
         // for ISA extension
         .accelerator_instr_mem(accelerator_instr_mem)
     );
@@ -255,9 +255,10 @@ module RISCVPipeline (
         //accelerator <-> cpu
     wire [2:0] acc_funct3;
     assign acc_funct3 = instr_funct3_mem;
-    assign accelerator_bus_read_request = ((acc_funct3==`SAVE)||(acc_funct3 == `LOAD)||(acc_funct3 == `RESET)||(acc_funct3 == `MOVE));
-    assign accelerator_bus_write_request = ((acc_funct3==`LOAD)||(acc_funct3 == `LOAD)||(acc_funct3 == `RESET)||(acc_funct3 == `MOVE));
-    assign accelerator_bus_write_data = accelerator_instr_mem && cache_read_data;//???
+    assign accelerator_bus_read_request = ((acc_funct3==`SAVE)||(acc_funct3 == `MATMUL)||(acc_funct3 == `RESET)||(acc_funct3 == `MOVE));
+    assign accelerator_bus_write_request = ((acc_funct3==`LOAD)||(acc_funct3 == `MATMUL)||(acc_funct3 == `RESET)||(acc_funct3 == `MOVE));
+    assign accelerator_bus_write_data = accelerator_instr_mem && cache_read_line_data;//cache_read/write_line_data
+    assign cache_request_from_accelerator = ((acc_funct3==`SAVE)||(acc_funct3 == `LOAD)) && accelerator_instr_mem;
     always@(*)begin
         case(acc_funct3)
             `LOAD, `SAVE, `RESET: accelerator_bus_addr = cache_addr + `ACCELERATOR_MEM_BASE_ADDR; // 是用cache_addr加还是用mem_addr加？
@@ -286,7 +287,7 @@ module RISCVPipeline (
         .mem_write_data(mem_write_data),
         .mem_addr(mem_addr),
         .mem_request_finish(mem_request_finish),
-        .mem_read_data(mem_read_data)
+        .mem_read_data(mem_read_data),
         // for accelerator ISA extension
         .cache_request_from_accelerator(cache_request_from_accelerator),
         .accelerator_cache_read_data(cache_read_line_data), 

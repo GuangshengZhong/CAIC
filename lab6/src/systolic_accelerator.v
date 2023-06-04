@@ -23,6 +23,7 @@ module SystolicAccelerator #(
 
     wire systolic_rst, systolic_accumulate_enable, systolic_read_enable;
     wire [31:0] systolic_row_index;
+    wire [BUS_PACKET_WIDTH-1:0] systolic_row_results;
 
     Controller ControllerModule(
         .clk(clk),.rst(rst),
@@ -43,8 +44,8 @@ module SystolicAccelerator #(
         );
     
     //FIFOBuffers
-    reg [DATA_WIDTH-1:0] west_fifo_output_data[0:ARRAY_SIZE-1];
-    reg [DATA_WIDTH-1:0] north_fifo_output_data[0:ARRAY_SIZE-1];
+    wire [DATA_WIDTH-1:0] west_fifo_output_data[0:ARRAY_SIZE-1];
+    wire [DATA_WIDTH-1:0] north_fifo_output_data[0:ARRAY_SIZE-1];
     wire [ARRAY_SIZE*DATA_WIDTH-1:0] west_inputs, north_inputs;
     genvar i;
     generate
@@ -77,7 +78,7 @@ module SystolicAccelerator #(
         .west_inputs(west_inputs),
         .north_inputs(north_inputs),
         .row_index(systolic_row_index),
-        .results(bus_slave_output)
+        .results(systolic_row_results)
     );
 
 
