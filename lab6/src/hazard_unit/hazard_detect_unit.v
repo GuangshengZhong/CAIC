@@ -39,10 +39,10 @@ module Hazard_Detect_Unit(
 	assign stall_mem = miss;
 	assign stall_wb = miss;
 	
-	assign bubble_if = 1'b0;
-	assign bubble_id = bubble;
-	assign bubble_ex = stall;
-	assign bubble_mem = 1'b0;
-	assign bubble_wb = 1'b0;
+	assign bubble_if = 1'b0 || rst;
+	assign bubble_id = bubble || rst;
+	assign bubble_ex = stall || rst;
+	assign bubble_mem = 1'b0 || rst;
+	assign bubble_wb = 1'b0 || rst;
 
 endmodule

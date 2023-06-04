@@ -16,7 +16,7 @@ module DataCache #(
     // ports between cache and CPU
     input read_request, write_request,
     input [2:0] write_type,
-    input [31:0] slave_addr, write_data,
+    input [31:0] addr, write_data,
     output miss, //给CPU传递状态机的状态信息
     output reg request_finish,
     output reg [31:0] read_data,
@@ -32,8 +32,7 @@ module DataCache #(
     input [BUFFER_SIZE*DATA_WIDTH-1:0] accelerator_cache_write_data,
     output reg [BUFFER_SIZE*DATA_WIDTH-1:0] accelerator_cache_read_data
 );
-    wire [31:0] addr;
-    assign addr = slave_addr - `DATA_MEM_BASE_ADDR;
+    // assign addr = slave_addr - `DATA_MEM_BASE_ADDR;
     // params to transfer bit number to count
     localparam WORD_ADDR_LEN = 2; // each word contains 4 bytes
     localparam MEM_ADDR_LEN = TAG_ADDR_LEN + SET_ADDR_LEN; // in cache line's granularity

@@ -55,7 +55,8 @@ module RISCVSoC (
         .instr(instr),
         .instr_addr(instr_addr),
         // for main memory
-        .data_bus_read_request(mem_read_request), .data_bus_write_request(mem_write_request),
+        .data_bus_read_request(mem_read_request), 
+        .data_bus_write_request(mem_write_request),
         .data_bus_write_data(mem_write_data),
         .data_bus_addr(mem_addr),
         .data_bus_request_finish(mem_request_finish),

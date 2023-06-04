@@ -60,6 +60,7 @@ module RISCVPipeline (
     reg accelerator_request_finish;
     wire accelerator_request_finish_wire;
     
+    assign mem_read_data = data_bus_read_data;
 
     //IF
     wire pc_src;
@@ -195,6 +196,7 @@ module RISCVPipeline (
     wire [31:0] imm_mem, rs2_data_mem, alu_result_mem, pc_plus4_mem, mem2reg_data;
     wire [2:0] write_type;
     wire [31:0] cache_addr;
+    assign cache_addr = alu_result_mem;
 
     EX_MEM ex_mem(
         //From id_ex
@@ -279,7 +281,8 @@ module RISCVPipeline (
         .read_request(mem_read_mem),.write_request(mem_write_mem),
         .write_type(write_type),
         //.addr(cache_addr),
-        .slave_addr(cache_addr),
+        .addr(cache_addr),
+        //.slave_addr(accelerator_bus_addr),
         .write_data(cache_write_data),
         .miss(cache_miss),
         .request_finish(cache_request_finish),//?
@@ -366,6 +369,7 @@ module RISCVPipeline (
         //.mem_read_ex(mem_read_ex), .mem_read_mem(mem_read_mem),.reg_write_ex(reg_write_ex),
         .mem_read_ex(mem_read_ex), .mem_read_mem(mem_read_mem),.reg_write_ex(reg_write_ex),.mem_read_id(mem_read_id),
         .cache_request_finish(cache_request_finish),
+        .miss(miss),
         //for bus
         .data_bus_request_finish(data_bus_request_finish),
         // for accelerator ISA extension
@@ -379,5 +383,4 @@ module RISCVPipeline (
         .stall_mem(stall_mem), .bubble_mem(bubble_mem),
         .stall_wb(stall_wb), .bubble_wb(bubble_wb)
     );
-    
 endmodule

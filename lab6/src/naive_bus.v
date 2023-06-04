@@ -80,6 +80,11 @@ module NaiveBus #(
                        (master2_read_request || master2_write_request) ? grant2 :
                        (master3_read_request || master3_write_request) ? grant3 :
                        3'b111;
+    // wire [2:0] grant = (master0_read_request || master0_write_request) ? grant0 :
+    //                    (master1_read_request || master1_write_request) ? grant1 :
+    //                    (master2_read_request || master2_write_request) ? grant2 :
+    //                    (master3_read_request || master3_write_request) ? grant3 :
+    //                    3'b111;
     wire write_request = (grant == grant0) ? master0_write_request :
                          (grant == grant1) ? master1_write_request :
                          (grant == grant2) ? master2_write_request :
