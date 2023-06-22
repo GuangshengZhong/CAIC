@@ -275,6 +275,7 @@ module RISCVPipeline (
 
     // memory access stage is partially executed outside the logic module
     wire cache_request_finish;
+    assign mem_request_finish = data_bus_request_finish && (mem_read_request || mem_write_request);
     DataCache #(.LINE_ADDR_LEN(LINE_ADDR_LEN)) data_cache(
         .clk(clk),.rst(rst),.debug(debug),
         // cache <-> cpu
@@ -285,7 +286,7 @@ module RISCVPipeline (
         //.slave_addr(accelerator_bus_addr),
         .write_data(cache_write_data),
         .miss(cache_miss),
-        .request_finish(cache_request_finish),//?
+        .request_finish(cache_request_finish),//hazard里面暂时用的是miss
         .read_data(cache_read_data),
         //cache <-> maim_mem
         .mem_read_request(mem_read_request), .mem_write_request(mem_write_request),
@@ -296,7 +297,8 @@ module RISCVPipeline (
         // for accelerator ISA extension
         .cache_request_from_accelerator(cache_request_from_accelerator),
         .accelerator_cache_read_data(cache_read_line_data), 
-        .accelerator_cache_write_data(cache_write_line_data)
+        //.accelerator_cache_write_data(cache_write_line_data)
+        .accelerator_cache_write_data(accelerator_bus_write_data)
     );
     MEM_MODULE mem_module(
         //From ex_mem
